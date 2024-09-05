@@ -1,0 +1,12 @@
+
+.btn{ 
+  font-size:1rem;
+  text-align: center;
+  background-color: #8f82b7; /* Example background color */
+  border-radius: 0.5rem;
+  cursor: pointer;
+  border:none;
+  color:#FFF;
+  transition: background-color 0.3s ease; /* Smooth transition effect */
+
+}

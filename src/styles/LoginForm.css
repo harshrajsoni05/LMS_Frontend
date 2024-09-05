@@ -1,0 +1,144 @@
+.login-form {
+  width: 80%;
+  text-align: center;
+  
+  font-size:1rem;
+  margin: 0 auto; /* Centers the form horizontally within its container */
+}
+
+::placeholder {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+}
+
+div.role-selection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #fff;
+  text-transform: uppercase;
+  margin-bottom: 20px; /* Adds space below the role selection */
+}
+
+.login-form h2 {
+  font-size: 1.25rem;
+  margin-bottom: 20px;
+  color: #6583b7;
+}
+
+.input-group {
+  width: 90%;
+  text-align: left;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  margin: 0 auto;
+  background-color: #effafc;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  color: #333; /* Text color inside the input */
+}
+
+.login-btn {
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-align: center;
+  text-transform: uppercase;
+  padding: 10px 30px;
+  margin: 20px auto; /* Centers the button horizontally */
+  background-color: #6583b7;
+  border-radius: 30px;
+  cursor: pointer;
+  border: none;
+  color: #fff;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.login-btn:hover {
+  background-color: #506da1; /* Darker shade for hover effect */
+  transform: scale(1.05);
+}
+
+.login-form p {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+/* Hide the radio buttons */
+.role-selection input[type="radio"] {
+  display: none;
+}
+
+/* Style the switch */
+.switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 12rem; /* Adjusted width for better spacing */
+  height: 1.75rem; /* Adjusted height */
+  border-radius: 30px;
+  padding: 5px;
+  position: relative;
+  background-color: #a1bedc; /* Background color for switch container */
+  margin: 0 auto; /* Centers the switch horizontally */
+  overflow: hidden; /* Ensures the slider doesn't overflow the container */
+}
+
+.switch-label {
+  flex: 1;
+  font-size: 0.9rem;
+  text-align: center;
+  cursor: pointer;
+  z-index: 1;
+  font-weight: bold;
+  color: #fff; /* Text color for better contrast */
+}
+
+/* The slider element */
+.slider {
+  position: absolute;
+  border-radius: 30px;
+  width: 50%; /* Width of the slider as a percentage of the switch width */
+  height: 100%;
+  background-color: #6583b7;
+  transition: transform 0.3s ease;
+  z-index: 0;
+}
+
+/* Adjust slider position based on the selected input */
+input#user:checked ~ .switch .slider {
+  transform: translateX(0); /* Slider stays on the left */
+}
+
+input#admin:checked ~ .switch .slider {
+  transform: translateX(93%); /* Slider moves fully to the right */
+}
+
+/* Hide the actual radio buttons */
+input[type="radio"] {
+  display: none;
+}
+
+.input-group .error {
+  border-color: red;
+}
+
+.error-text {
+  color: #af4c4c;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.login-btn[disabled] {
+  background-color: grey;
+  cursor: not-allowed;
+}

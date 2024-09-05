@@ -1,0 +1,35 @@
+.search-bar {
+  position: relative;
+  display: inline-block;
+  margin:1rem;
+}
+
+.search-input {
+  height: 0.6rem;
+  background-color: #e6ecf5;
+  padding: 1rem 3rem 1rem 1rem; 
+  border-radius: 1rem;
+  width: 25rem;
+  font-size: 1rem;
+  border-color:#c1d0e7;
+  box-sizing: border-box;
+  
+}
+
+.search-button {
+  position: absolute;
+  top: 50%;
+  right: 1rem;
+  transform: translateY(-65%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 1;
+}
+
+.search-icon {
+  width: 1.2rem;
+  height: auto;
+  vertical-align: middle;
+}

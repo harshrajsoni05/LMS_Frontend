@@ -1,0 +1,73 @@
+.custom-table-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: separate; 
+  border-spacing: 0;
+  margin: 1rem 0;
+  font-size: 1rem;
+  text-align: left;
+  border-radius: 0.5rem; 
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); 
+}
+
+.custom-table thead tr {
+  background-color: #506892;
+  color: #fff;
+}
+
+.custom-table th, .custom-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #ddd;
+}
+
+.custom-table tbody tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.custom-table thead tr th:first-child {
+  border-top-left-radius: 0.5rem;
+}
+
+.custom-table thead tr th:last-child {
+  border-top-right-radius: 0.5rem;
+}
+
+.custom-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 0.5rem;
+}
+
+.custom-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 0.5rem;
+}
+
+.custom-table th {
+  position: relative;
+  padding-right: 2rem; 
+}
+
+.custom-table th .react-icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 1rem;
+  color: #fff; 
+}
+
+.custom-table th .react-icon.default {
+  color: #ccc
+}
+
+.custom-table th .react-icon.asc {
+  color: #fff; 
+}
+
+.custom-table th .react-icon.desc {
+  color: #fff; 
+}

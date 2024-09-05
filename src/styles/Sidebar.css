@@ -1,0 +1,107 @@
+/* Base styles for larger screens */
+
+.sidebar-menu {
+  height: 82.75vh;
+  background-color: #a1bedc;
+  padding: 20px;
+  display: flex;
+  flex-direction: column; 
+  justify-content: space-between;
+}
+
+.menu-list {
+  list-style: none;
+  padding: 1.5rem;
+}
+
+.menu-item {
+  margin-bottom: 30px;
+}
+
+.menu-item a {
+  text-decoration: none;
+  margin: 10px 0;
+  color: #506892;
+  font-size: 1.3rem;
+  transition: font-size 0.3s ease, transform 0.3s ease; 
+}
+
+.menu-item a:hover {
+  color: black;    
+  font-size: 1.4rem;
+  transform: scale(1.25); /* Slight scaling for a smooth effect */
+}
+
+.menu-item a.active {
+  color: black; 
+  font-size: 1.55em; 
+  transform: scale(1.25);
+}
+
+.menu-item img {
+  width: 1.4rem; /* Default size */
+  height: auto; /* Maintain the aspect ratio */
+  margin-right: 10px;
+  margin-bottom: 8px; /* Space between the image and the text */
+  vertical-align: middle; /* Align the image with the text */
+  transition: transform 0.3s ease; /* Smooth transition */
+}
+
+.menu-item img a.active {
+  transform: scale(1.5);
+}
+
+.btn-center {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+}
+
+.logout-btn {
+  padding: 0.65rem;
+  font-size: 1rem;
+  font-family: "Poppins", sans-serif;
+  background-color: #506892;
+  margin-left: 1rem;
+  transition: padding 0.3s ease, font-size 0.3s ease, transform 0.3s ease; /* Smooth transition */
+}
+
+.logout-btn:hover {
+  transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .sidebar-menu {
+    height: auto; 
+    padding: 20px;
+  }
+
+  .menu-list {
+    padding: 1rem;
+    
+  }
+
+  .menu-item {
+    margin-bottom: 20px;
+  }
+
+  .menu-item a {
+    font-size: 0.9rem;
+  }
+
+  .menu-item a:hover {
+    font-size: 1.2rem;
+  }
+
+  .menu-item img {
+    width: 1.2rem; /* Smaller size for tablets */
+    margin-right: 8px;
+    margin-bottom: 6px;
+  }
+
+  .logout-btn {
+    font-size: 0.9rem;
+    padding: 0.6rem;
+    margin-left: 0.5rem;
+  }
+}

@@ -1,0 +1,101 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(224, 243, 255, 0.2); /* Light blue background with reduced opacity */
+  color: #0056b3; /* Dark blue text */
+  font-size: 1rem;
+  z-index: 1000;
+}
+
+.modal-content {
+  display: flex;
+  background-color: #e0f3ff; /* Light blue background */
+  padding:3rem;
+  padding-top:0;
+  padding-bottom:1rem;
+  border-radius: 0.625rem;
+  width: auto;
+  position: relative;
+  box-shadow: 0 0.3125rem 0.9375rem rgba(0, 0, 0, 0.2); /* Subtle shadow */
+  transition: transform 0.3s ease; /* Smooth opening animation */
+}
+
+.modal-content:focus {
+  transform: scale(1.02); /* Slightly enlarge on focus */
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 0.625rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #007acc;
+  transition: color 0.3s ease; /* Smooth color transition on hover */
+}
+
+.modal-close:hover {
+  color: #0056b3; /* Change to dark blue on hover */
+}
+
+.modal-form-heading {
+  display: flex;
+
+  justify-content: left;
+  color: #6583b7; /* Dark blue heading text */
+}
+
+.modal-form-heading h2{
+  font-size:1.7rem;
+}
+
+.modal-form-input-div {
+  display: flex;
+  flex-direction: column;
+  justify-content:center;
+  align-items:center;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+.modal-form-input input{
+  font-family: "Poppins", sans-serif;
+  padding: 0.5rem;
+  border-color: #D3D3D3;
+  border-radius: 0.3125rem;
+  transition: border-color 0.3s ease; 
+}
+.modal-form-input select {
+  font-family: "Poppins", sans-serif;
+  border-color: #D3D3D3;
+  padding: 0.2rem 0.2rem;
+  border-radius: 0.3125rem;
+  transition: border-color 0.3s ease; 
+}
+
+.modal-form-input input:focus,
+.modal-form-input select:focus {
+  border-color: #0056b3; 
+  outline: none; 
+}
+
+.modal-form-input select {
+  background-color: #fff; 
+  padding-right: 2.8rem; 
+}
+
+.modal-form-input select:focus {
+  background-color: #e0f3ff; 
+}
+
+.modal-form-input select::-webkit-scrollbar {
+  display: none;
+}

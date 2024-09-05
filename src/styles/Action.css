@@ -1,0 +1,17 @@
+.action-buttons {
+    display: flex;
+    gap: 20px;
+   
+  }
+  
+  .action-icon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  
+  .action-icon:hover {
+    transform: scale(1.1);
+  }
+  
