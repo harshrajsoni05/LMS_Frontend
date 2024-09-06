@@ -8,11 +8,9 @@ import '../styles/Header.css';
 
 const Header = ({ role, userName}) => {
   const navigate = useNavigate(); 
-  console.log(userName);
   
   const onLogout = async () => {
     try {
-      // Remove JWT jwtToken from localStorage
       localStorage.removeItem("jwtToken");
       navigate("/"); 
     } catch (error) {

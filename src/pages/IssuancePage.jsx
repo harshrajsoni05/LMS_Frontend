@@ -13,6 +13,7 @@ import SearchBar from "../components/searchbar";
 import WithLayoutComponent from "../hocs/WithLayoutComponent";
 import Dynamicform from "../components/dynamicform";
 import Tooltip from "../components/toolTip";
+import Toast from "../components/toast/toast";
 
 import back from "../assets/images/go-back.png";
 import next from "../assets/images/go-next.png";
@@ -50,6 +51,20 @@ function IssuancesPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 500);
 
+  const [showToast, setShowToast] = useState(false);
+  const [toastType, setToastType] = useState('success');
+  const [toastMessage, setToastMessage] = useState('');
+  const showSuccessToast = (message) => {
+    setToastType('success');
+    setToastMessage(message);
+    setShowToast(true);
+  };
+  const showFailureToast = (message) => {
+    setToastType('failure');
+    setToastMessage(message);
+    setShowToast(true);
+  };
+
   const getIssuances = async () => {
     try {
       const data = await fetchIssuances(currentPage, pageSize, debouncedSearchTerm.trim());
@@ -79,8 +94,12 @@ function IssuancesPage() {
       await updateIssuance(currentData.id, issuanceToUpdate);
       getIssuances();
       handleCloseModal();
+      showSuccessToast("Issuance Edited successfully!");
+
     } catch (error) {
       console.error("Failed to update issuance:", error);
+      showFailureToast("Failed to update Issuance");
+
     }
   };
 
@@ -89,8 +108,12 @@ function IssuancesPage() {
       try {
         await deleteIssuance(id);
         setIssuances(issuances.filter((issuance) => issuance.id !== id));
+        showSuccessToast("Issuance Deleted successfully!");
+
       } catch (error) {
         console.error("Failed to delete the issuance:", error);
+        showFailureToast("Failed to Delete Issuance");
+
       }
   };
 
@@ -140,8 +163,11 @@ function IssuancesPage() {
     { header: "User", render: (rowData) => rowData?.users?.name || "N/A" },
     { header: "Book", render: (rowData) => rowData?.books?.title || "N/A" },
     { header: "Status", accessor: "status" },
-    { header: "Issuance Type", accessor: "issuance_type" },
     {
+      header: "Issuance Type",render: (rowData) => {
+        return rowData.issuance_type === "In House" ? "Takeaway" : "In House";
+      }
+    },    {
       header: "Issue Date",
       render: (rowData) => formatDate(rowData.issue_date),
     },
@@ -275,8 +301,8 @@ function IssuancesPage() {
               placeholder: "Issuance Type",
               required: true,
               options: [
-                { value: "Library", label: "Library" },
-                { value: "In House", label: "In House" },
+                { value: "Library", label: "In House" },
+                { value: "In House", label: "Takeaway" },
               ],
               defaultValue: currentData.issuance_type,
             },
@@ -285,7 +311,13 @@ function IssuancesPage() {
           onCancel={handleCloseModal}
         />
       </CustomModal>
-          
+      {showToast && (
+          <Toast
+            type={toastType}
+            message={toastMessage}
+            onClose={() => setShowToast(false)}
+          />
+        )}
       
       
     </>

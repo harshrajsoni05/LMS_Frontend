@@ -54,7 +54,7 @@ const deleteUser = async (id) => {
 
 const SearchByNumber = async (number) => {
   try {
-    const response = await axiosInstance.get(`${API_BASE_URL}`, {
+    const response = await axiosInstance.get(`${API_BASE_URL}/search`, {
 
       params: {
         phoneNumber: number,
@@ -68,6 +68,5 @@ const SearchByNumber = async (number) => {
     throw error;
   }
 };
-
 
 export { SearchByNumber,fetchUsers, RegisterUser, updateUser, deleteUser };

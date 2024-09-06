@@ -1,12 +1,13 @@
 .issuance-form {
     display: flex;
     flex-direction: column;
+    width:100%;
   }
 .issuance-form h2 {
-  color: #E04736;
+  color: #6583b7;
 }
 .issuance-form h2 span {
-  font-weight: 100;
+  font-weight: 300;
 }
   .form-group {
     display: flex;
@@ -15,26 +16,26 @@
   }
   .form-group label {
     font-size: 15px;
-    font-weight:800;
-    color: #E04736;
+    font-weight:600;
+    color: #6583b7;
   }
   .form-group input {
     padding: 10px;
     border: none;
     outline: none;
-    border: 2px solid lightcoral;
+    border: 2px solid #6583b7;
   }
   .form-group select {
     padding: 10px;
-    border: 2px solid lightcoral;
   }
   .submit-button {
     padding: 0.5rem 1rem;
-    background-color:rgb(253, 76, 76);
+    background-color:#6583b7;
     color: white;
     border: none;
     cursor: pointer;
+    margin-top:2rem;
   }
   .submit-button:hover {
-    background-color: #E84012;
+    background-color: #;
   }

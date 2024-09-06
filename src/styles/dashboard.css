@@ -1,11 +1,9 @@
 /* Base styles for larger screens */
 
 .dashboard {
-  display: flex;
-  margin-top: 1rem;
-  flex-wrap: wrap;
-  padding-right: 3.5rem;
-  padding-left: 3.5rem;
+  display: grid;
+  grid-template-columns:24% 24% 24% 24%;
+  padding:2% 6% 0 6%;
   justify-content: space-around;
 }
 
@@ -14,9 +12,7 @@
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   padding: 2.5rem;
-  margin: 2rem;
-  margin-bottom: 1rem;
-  width: auto;
+  width: 8rem;
   height: 8.5rem;
   transition: transform 0.3s ease;
   text-align: center;
@@ -44,21 +40,17 @@
 }
 
 .latest-books {
-  background-color: #f8f9fa; /* Light background for contrast */
+  background-color: #f8f9fa; 
 }
 
 .latest-books h2 {
-  color: #506892; /* Matching the dashboard heading color */
+  color: #506892; 
 }
 
 .latest-books-container {
-  display: flex;
-  flex-wrap: wrap;
-  width: 100vw;
-  margin-left: 2rem;
-  margin-right: 2rem;
-  justify-content: space-around;
-  gap: 1rem; /* Space between book cards */
+  display: grid;
+  grid-template-columns:20% 20% 20% 20% 20%;
+  padding: 0% 5%;  
 }
 
 .book-card {
@@ -98,9 +90,14 @@
   background-color: #e0e0e0;
 }
 
-.recent-books-heading h2 {
-  font-size: 1rem;
+.recent-books-heading p {
+  font-size: 1.2rem;
   color: #506892;
+  font-weight:600;
+}
+.recent-books-heading{
+  text-align:center;
+  margin-top:3%;
 }
 
 /* Responsive styles for tablets (around 768px) */

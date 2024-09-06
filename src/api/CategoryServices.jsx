@@ -58,6 +58,5 @@ const deleteCategory = async (id) => {
   }
 };
 
-// This function isn't needed based on the provided URLs, but if needed in future, it can be added similarly to books.
 
 export { fetchCategories, addCategory, updateCategory, deleteCategory };

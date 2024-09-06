@@ -22,12 +22,20 @@ import Tooltip from "../components/toolTip";
 //images
 import EditIcon from "../assets/images/editicon.png";
 import DeleteIcon from "../assets/images/deleteicon.png";
+import historyicon from "../assets/images/historyicon.png";
 import back from "../assets/images/go-back.png";
 import next from "../assets/images/go-next.png";
 import AssignUser from "../assets/images/alloticon.png";
 import IssuanceForm from "../components/issuanceform";
 
+
+//
+import Toast from "../components/toast/toast";
+import { useNavigate } from "react-router-dom";
+
 function BooksPage() {
+  const navigate = useNavigate();
+
   const [books, setBooks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,6 +61,20 @@ function BooksPage() {
   const [issuanceType, setIssuanceType] = useState('library');
   const [isIssuanceModalOpen,setIsIssuanceModalOpen]=useState(false)
   const [userNotRegistered, setUserNotRegistered] = useState(false);
+
+  const [showToast, setShowToast] = useState(false);
+  const [toastType, setToastType] = useState('success');
+  const [toastMessage, setToastMessage] = useState('');
+  const showSuccessToast = (message) => {
+    setToastType('success');
+    setToastMessage(message);
+    setShowToast(true);
+  };
+  const showFailureToast = (message) => {
+    setToastType('failure');
+    setToastMessage(message);
+    setShowToast(true);
+  };
 
   const getBooks = async () => {
     try {
@@ -92,6 +114,8 @@ function BooksPage() {
       };
       await addBook(bookToCreate);
       getBooks();
+      showSuccessToast("Book added successfully!");
+
       handleCloseModal();
     } catch (error) {
       console.error("Failed to add book:", error.message);
@@ -110,6 +134,8 @@ function BooksPage() {
       await updateBook(currentData.id, bookToUpdate);
       getBooks();
       handleCloseModal();
+      showSuccessToast("Book edited Successfully!");
+
     } catch (error) {
       console.error("Failed to update book:", error);
     }
@@ -117,14 +143,16 @@ function BooksPage() {
 
   const handleDelete = async (rowData) => {
     const id = rowData.id;
-    if (window.confirm('Are you sure you want to delete this Book?')){
       try {
         await deleteBook(id);
         setBooks(books.filter((book) => book.id !== id));
+        showSuccessToast("Book deleted Successfully!");
+        handleCloseModal();
+
       } catch (error) {
         console.error("Failed to delete the book", error);
       }
-    }
+    
   };
 
   const handleIssuanceSubmit = async (issuanceDetails) => {
@@ -138,13 +166,13 @@ function BooksPage() {
       else if (response==="No copies available for the selected book."){
              alert(response);
       }
-      else {
-          alert("Issuance created successfully.");
-      }
+      
       getBooks();
+      showSuccessToast("Issued book Successfully!");
+
   } catch (error) {
       console.error("Failed to create issuance:", error);
-      alert("Failed to create issuance.");
+      showFailureToast("Failed Issuance!");
   }
   };
 
@@ -205,7 +233,7 @@ function BooksPage() {
 
   const renderActions = (rowData) => (
     <div className="actionicons">
-      <Tooltip message="Assign">
+      <Tooltip message="Issue">
         <img
           src={AssignUser}
           alt="Assign User"
@@ -223,15 +251,27 @@ function BooksPage() {
           onClick={() => handleOpenModal("edit", rowData)}
         />
       </Tooltip>
-
-      <Tooltip message="Delete">
+      
+      <Tooltip message="Records">
         <img
-          src={DeleteIcon}
-          alt="Delete"
+          src={historyicon}
+          alt="history"
           className="action-icon"
-          onClick={() => handleDelete(rowData)}
+          onClick={() => navigate(`/history/book/${rowData.id}`, { state: { rowData } })}
         />
       </Tooltip>
+
+      <Tooltip message="Delete">
+    <img
+      src={DeleteIcon}
+      alt="Delete"
+      className="action-icon"
+      onClick={() => handleOpenModal("delete", rowData)} // pass rowData for deletion
+    />
+    </Tooltip>
+
+
+      
     </div>
   );
 
@@ -276,96 +316,81 @@ function BooksPage() {
       </div>
 
       <CustomModal isOpen={isModalOpen} onClose={handleCloseModal}>
-        {modalType === 'edit' || modalType === 'add' ? (
-          <Dynamicform
-            heading={modalType === 'edit' ? 'Edit Book' : 'Add Book'}
-            fields={[
-              {
-                name: 'category_id',
-                type: 'select',
-                placeholder: 'Select Category',
-                required: true,
-                options: categories.map(category => ({
-                  value: category.id,
-                  label: category.name,
-                })),
-                defaultValue: currentData.category_id,
-              },
-              {
-                name: 'title',
-                type: 'text',
-                placeholder: 'Book Title',
-                required: true,
-                defaultValue: currentData.title,
-              },
-              {
-                name: 'author',
-                type: 'text',
-                placeholder: 'Author Name',
-                required: true,
-                defaultValue: currentData.author,
-              },
-              {
-                name: 'quantity',
-                type: 'number',
-                placeholder: 'Quantity',
-                required: true,
-                defaultValue: currentData.quantity,
-              },
-              {
-                name: 'imageURL',
-                type: 'text',
-                placeholder: 'Image URL',
-                defaultValue: currentData.imageURL,
-              },
-            ]}
-            onCancel={handleCloseModal}
-            onSubmit={handleSubmitModal}
-            submitLabel={modalType === 'edit' ? 'Save' : 'Add'}
-          />
-        ) : modalType === 'assign' ? (
-          <Dynamicform
-            heading="Assign Book"
-            fields={[
-              {
-                name: 'phoneNumber',
-                type: 'text',
-                placeholder: 'Enter User Phone Number',
-                required: true,
-                defaultValue: phoneNumber,
-                onChange: (e) => setPhoneNumber(e.target.value),
-              },
-              {
-                name: 'issuanceType',
-                type: 'select',
-                placeholder: 'Select Issuance Type',
-                required: true,
-                options: [
-                  { value: 'library', label: 'Library' },
-                  { value: 'in-house', label: 'In-House' },
-                ],
-                defaultValue: issuanceType,
-                onChange: (e) => setIssuanceType(e.target.value),
-              },
-            ]}
-            onCancel={handleCloseModal}
-            onSubmit={handleSubmitModal}
-            submitLabel="Assign"
-          />
-        ) : null}
+  {modalType === 'edit' || modalType === 'add' ? (
+    <Dynamicform
+      heading={modalType === 'edit' ? 'Edit Book' : 'Add Book'}
+      fields={[
+        {
+          name: 'category_id',
+          type: 'select',
+          placeholder: 'Select Category',
+          required: true,
+          options: categories.map(category => ({
+            value: category.id,
+            label: category.name,
+          })),
+          defaultValue: currentData.category_id,
+        },
+        {
+          name: 'title',
+          type: 'text',
+          placeholder: 'Book Title',
+          required: true,
+          defaultValue: currentData.title,
+        },
+        {
+          name: 'author',
+          type: 'text',
+          placeholder: 'Author Name',
+          required: true,
+          defaultValue: currentData.author,
+        },
+        {
+          name: 'quantity',
+          type: 'number',
+          placeholder: 'Quantity',
+          required: true,
+          defaultValue: currentData.quantity,
+        },
+        {
+          name: 'imageURL',
+          type: 'text',
+          placeholder: 'Image URL',
+          defaultValue: currentData.imageURL,
+        },
+      ]}
+      onCancel={handleCloseModal}
+      onSubmit={handleSubmitModal}
+      submitLabel={modalType === 'edit' ? 'Save' : 'Add'}
+    />
+  ) : modalType === 'assign' ? (
+    <IssuanceForm
+      onSubmit={handleIssuanceSubmit}
+      selectedBook={selectedBook}
+      onClose={handleCloseModal}
+    />
+  ) : modalType === 'delete' ? (
 
-        {userNotRegistered && (
-          <div className="error-message">User not registered!</div>
+    <div className="confirmation">
+      <p>Are you sure you want to delete this Book?</p>
+      <div className="confirmation-buttons">
+      <CustomButton onClick={() => handleDelete(currentData)} name="Yes"></CustomButton>
+      <CustomButton onClick={handleCloseModal} name="No"></CustomButton></div>
+      </div>
+  ) 
+  
+  : null}
+
+</CustomModal>
+
+{showToast && (
+          <Toast
+            type={toastType}
+            message={toastMessage}
+            onClose={() => setShowToast(false)}
+          />
         )}
-      </CustomModal>
-        
-      <CustomModal isOpen={isIssuanceModalOpen} onClose={() => setIsIssuanceModalOpen(false)}>
-        <IssuanceForm
-          onSubmit={handleIssuanceSubmit}
-          selectedBook={selectedBook}
-          onClose={() => setIsIssuanceModalOpen(false)}
-        />
-      </CustomModal>
+
 
     </>
   );

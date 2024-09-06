@@ -81,5 +81,21 @@ const assignBookToUser = async (bookId, userId) => {
   }
 };
 
+const findBookSuggestions = async (query) => {
+  try {
+    const response = await axiosInstance.get(`${API_BASE_URL}`,{
+      params :{
+        query:query
+      }
+    })
+    return response.data;
 
-export { fetchAllBooks ,fetchBooks, addBook, updateBook, deleteBook, assignBookToUser };
+  } catch (error) {
+    console.error("Error assigning book:", error);
+    throw error;
+  }
+};
+
+
+
+export { findBookSuggestions ,fetchAllBooks ,fetchBooks, addBook, updateBook, deleteBook, assignBookToUser };

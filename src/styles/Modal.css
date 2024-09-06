@@ -7,27 +7,25 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: rgba(224, 243, 255, 0.2); /* Light blue background with reduced opacity */
-  color: #0056b3; /* Dark blue text */
+  background-color: rgba(224, 243, 255, 0.2);
+  color: #506892; 
   font-size: 1rem;
   z-index: 1000;
 }
 
 .modal-content {
   display: flex;
-  background-color: #e0f3ff; /* Light blue background */
-  padding:3rem;
-  padding-top:0;
-  padding-bottom:1rem;
+  background-color: #e0f3ff; 
+  padding:2rem;
+  padding-top:1rem;
   border-radius: 0.625rem;
-  width: auto;
   position: relative;
-  box-shadow: 0 0.3125rem 0.9375rem rgba(0, 0, 0, 0.2); /* Subtle shadow */
-  transition: transform 0.3s ease; /* Smooth opening animation */
+  box-shadow: 0 0.3125rem 0.9375rem rgba(0, 0, 0, 0.2); 
+  transition: transform 0.3s ease; 
 }
 
 .modal-content:focus {
-  transform: scale(1.02); /* Slightly enlarge on focus */
+  transform: scale(1.02); 
 }
 
 .modal-close {
@@ -39,22 +37,22 @@
   font-size: 1.5rem;
   cursor: pointer;
   color: #007acc;
-  transition: color 0.3s ease; /* Smooth color transition on hover */
+  transition: color 0.3s ease; 
 }
 
 .modal-close:hover {
-  color: #0056b3; /* Change to dark blue on hover */
+  color: #0056b3; 
 }
 
 .modal-form-heading {
   display: flex;
 
   justify-content: left;
-  color: #6583b7; /* Dark blue heading text */
+  color: #6583b7; 
 }
 
 .modal-form-heading h2{
-  font-size:1.7rem;
+  font-size:1.5rem;
 }
 
 .modal-form-input-div {
@@ -98,4 +96,15 @@
 
 .modal-form-input select::-webkit-scrollbar {
   display: none;
+}
+.confirmation{
+  padding-top:0rem;
+}
+.confirmation p{
+  font-size:1rem;
+}
+.confirmation-buttons {
+display:flex;
+align-items:center;
+justify-content:center;
 }

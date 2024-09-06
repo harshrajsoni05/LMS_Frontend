@@ -8,14 +8,15 @@ import next from  "../../assets/images/go-next.png"
 import { useSelector } from "react-redux";
 
 
-function UserHistoryPage() {
+function UserHistoryPage( ) {
   const [issuances, setIssuances] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [pageSize] = useState(10);
   const [totalPages, setTotalPages] = useState(0);
 
   const auth = useSelector((state) => state.auth);
-  const userId = auth.id; 
+
+  const userId =  auth.id; 
 
   const getIssuances = async () => {
     try {

@@ -14,13 +14,16 @@ import Dynamicform from '../components/dynamicform';
 import CustomButton from '../components/button';
 import Tooltip from '../components/toolTip';
 import WithLayoutComponent from '../hocs/WithLayoutComponent';
+import Toast from '../components/toast/toast';
 
-//images
 import back from '../assets/images/go-back.png';
 import next from '../assets/images/go-next.png';
 import EditIcon from '../assets/images/editicon.png';
 import DeleteIcon from '../assets/images/deleteicon.png';
 import assign from '../assets/images/bookaddd.png';
+import historyicon from '../assets/images/historyicon.png'
+import { useNavigate } from 'react-router-dom';
+import UserIssuanceform from '../components/userIssuanceform';
 
 const useDebouncedValue = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -52,9 +55,24 @@ function UsersPage() {
   const [issueDate, setIssueDate] = useState('');
   const [returnDate, setReturnDate] = useState('');
   const [status, setStatus] = useState('issued');
-  const [issuanceType, setIssuanceType] = useState('library');
+  const [issuanceType, setIssuanceType] = useState('');
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 500);
 
+  const [showToast, setShowToast] = useState(false);
+  const [toastType, setToastType] = useState('success');
+  const [toastMessage, setToastMessage] = useState('');
+  const showSuccessToast = (message) => {
+    setToastType('success');
+    setToastMessage(message);
+    setShowToast(true);
+  };
+  const showFailureToast = (message) => {
+    setToastType('failure');
+    setToastMessage(message);
+    setShowToast(true);
+  };
+
+  const navigate = useNavigate();
   // Fetch Data
   const getUsers = async () => {
     try {
@@ -98,8 +116,11 @@ function UsersPage() {
       await updateUser(currentData.id, userToUpdate);
       getUsers();
       handleCloseModal();
+      showSuccessToast("User edit Success!");
+
     } catch (error) {
       console.error('Failed to update user:', error);
+      showFailureToast("Failed to update User")
     }
   };
   
@@ -109,8 +130,12 @@ function UsersPage() {
       try {
         await deleteUser(id);
         setUsers(users.filter(user => user.id !== id));
+        showSuccessToast("User Deleted successfully!");
+
       } catch (error) {
         console.error('Failed to delete the user:', error);
+        showFailureToast("Failed to Delete User")
+
       }
     }
   };
@@ -125,13 +150,17 @@ function UsersPage() {
         status: "Issued",
         issuance_type: issuanceType,
       };
+      console.log(issuanceDetails);
       
-      console.log("issuanceDetails->>>>>" ,issuanceDetails)
       try {
         await addIssuance(issuanceDetails);
-        handleCloseModal(); // Close the modal on success
+        handleCloseModal(); 
+        showSuccessToast("Book Issued successfully!");
+
       } catch (error) {
         console.error('Failed to create issuance:', error);
+        showFailureToast("Failed to Issue Book!")
+
       }
     } else {
       console.error('All fields are required to create an issuance');
@@ -166,7 +195,7 @@ function UsersPage() {
     setIssueDate('');
     setReturnDate('');
     setStatus('issued');
-    setIssuanceType('library');
+    setIssuanceType('');
   };
 
   const generatePassword = (length = 8) => {
@@ -188,8 +217,10 @@ function UsersPage() {
     await RegisterUser(updatedUserData);
     getUsers();
     handleCloseModal();
+    showSuccessToast("User Registered successfully!")
   } catch (error) {
     console.log(error);
+    showFailureToast("User Failed to Register!")
   }
 };
 
@@ -205,7 +236,6 @@ function UsersPage() {
     
   };
 
-  // Define Table Columns
   const columns = [
     { header: 'S No.', accessor: 'serialNo' },
     { header: 'Name', accessor: 'name' },
@@ -215,7 +245,7 @@ function UsersPage() {
       header: 'Actions',
       render: (rowData) => (
         <div className="actionicons">
-          <Tooltip message="Assign Book">
+          <Tooltip message="Issue Book">
             <img
               src={assign}
               alt="Assign Book"
@@ -232,6 +262,15 @@ function UsersPage() {
               onClick={() => handleOpenModal('edit', rowData)}
             />
           </Tooltip>
+          <Tooltip message="Records">
+
+          <img
+            src={historyicon}
+            alt="history"
+            className="action-icon"
+            onClick={() => navigate(`/history/user/${rowData.id}`, { state: { rowData } })}
+          />
+          </Tooltip>
           <Tooltip message="Delete">
             <img
               src={DeleteIcon}
@@ -247,7 +286,6 @@ function UsersPage() {
 const handleBookSelection = (e) => {
   const selectedBookId = e.target.value;
 
-  // Only proceed if books array is defined and not empty
   if (books?.length) {
     const selectedBook = books.find(book => book.id === parseInt(selectedBookId, 10));
     setSelectedBook(selectedBook);
@@ -295,47 +333,11 @@ const handleBookSelection = (e) => {
       </div>
       <CustomModal isOpen={isModalOpen} onClose={handleCloseModal}>
   {modalType === 'assign' ? (
-    <div>
-      <h2>Assign Book</h2>
-      <div>
-        <h1>{currentData.name}</h1>
-      </div>
-      <div>
-        <label htmlFor="bookSelect">Select Book</label>
-        <select id="bookSelect" value={selectedBook?.id || ''} onChange={handleBookSelection}>
-          <option value="" disabled>Select a book</option>
-
-          {books.map(book => (
-            <option key={book.id} value={book.id}>
-              {book.title}
-            </option>
-          ))}
-
-
-        </select>
-      </div>
-      <div>
-        <label htmlFor="issueDate">Issue Date</label>
-        <input
-          type="datetime-local"
-          id="issueDate"
-          value={issueDate}
-          onChange={e => setIssueDate(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="issuanceType">Issuance Type</label>
-        <select
-          id="issuanceType"
-          value={issuanceType}
-          onChange={e => setIssuanceType(e.target.value)}
-        >
-          <option value="Library">In House</option>
-          <option value="In House">Takeaway</option>
-        </select>
-      </div>
-      <CustomButton name="Issue Book" onClick={handleIssueBook} />
-    </div>
+    <UserIssuanceform
+      onSubmit={handleIssueBook} // Make sure this function handles the form submission
+      selectedUser={currentData} // Pass the selected user details
+      onClose={handleCloseModal} // Function to close the modal
+    />
   ) : modalType === 'edit' ? (
     <Dynamicform
       heading="Edit User"
@@ -345,15 +347,6 @@ const handleBookSelection = (e) => {
         { name: 'number', type: 'text', placeholder: 'Number', defaultValue: currentData.number },
         { name: 'password', type: 'password', placeholder: 'Password' },
         { name: 'confirmPassword', type: 'password', placeholder: 'Confirm Password' },
-        // {
-        //   name: 'role',
-        //   type: 'select',
-        //   options: [
-        //     { value: 'ROLE_USER', label: 'User' },
-        //     { value: 'ROLE_ADMIN', label: 'Admin' },
-        //   ],
-        //   placeholder: 'Role',
-        // },
       ]}
       onSubmit={handleSubmitModal}
       defaultValues={currentData}
@@ -365,12 +358,20 @@ const handleBookSelection = (e) => {
         { name: 'name', type: 'text', placeholder: 'Enter Name' },
         { name: 'email', type: 'email', placeholder: 'Enter Email' },
         { name: 'number', type: 'text', placeholder: 'Enter Phone Number' },
-       
       ]}
       onSubmit={handleSubmitModal}
     />
   ) : null}
 </CustomModal>
+
+
+{showToast && (
+          <Toast
+            type={toastType}
+            message={toastMessage}
+            onClose={() => setShowToast(false)}
+          />
+        )}
 
     </>
   );

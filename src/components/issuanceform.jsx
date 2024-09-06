@@ -1,27 +1,33 @@
 import { useState } from "react";
-import "../styles/Issuanceform.css"; // Add appropriate CSS styling
-import { SearchByNumber as findUserByMobile  } from "../api/UserServices";
-import Button from "../components/button";
+import "../styles/Issuanceform.css";
+import { SearchByNumber as findUserByMobile } from "../api/UserServices";
 import { formatTimestamp } from "../components/utils";
+import CustomButton from "../components/button";
 
 const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
   const [userMobileNumber, setUserMobileNumber] = useState("");
-  const [userId, setUserId] = useState(null);
-  const [issuanceType, setIssuanceType] = useState("Home");
+  const [user_id, setuser_id] = useState(null);
+  const [issuance_type, setIssuanceType] = useState("Home");
   const [returnDate, setReturnDate] = useState("");
   const [returnTime, setReturnTime] = useState("");
-  const [issuedAt] = useState(formatTimestamp(new Date()));
+  const [issuedAt] = useState(new Date());
   const [expectedReturn, setExpectedReturn] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
   const fetchUserDetails = async (mobileNumber) => {
     try {
       const userDetails = await findUserByMobile(mobileNumber);
-      setUserId(userDetails.id);
-      setErrorMessage("");
+      if (userDetails.content && userDetails.content.length > 0) {
+        const user = userDetails.content[0];
+        setuser_id(user.id);
+        setErrorMessage("");
+      } else {
+        setuser_id(null);
+        setErrorMessage("User not found. Please register first.");
+      }
     } catch (error) {
       console.error("Failed to fetch user details:", error);
-      setUserId(null);
+      setuser_id(null);
       setErrorMessage("User not found. Please register first.");
     }
   };
@@ -32,40 +38,43 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
     if (mobileNumber.length >= 10) {
       fetchUserDetails(mobileNumber);
     } else {
-      setUserId(null);
+      setuser_id(null);
       setErrorMessage("");
     }
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (!userId) {
+    if (!user_id) {
       setErrorMessage("Please enter a valid mobile number and try again.");
       return;
     }
+
     let returnedAt = null;
-    if (issuanceType === "Home" && returnDate) {
-      returnedAt = formatTimestamp(`${returnDate}T23:59:59`);
-    } else if (issuanceType === "Library" && returnTime) {
+    if (issuance_type === "Home" && returnDate) {
+      returnedAt = formatTimestamp(`${returnDate} 23:59:59`);
+    } else if (issuance_type === "Library" && returnTime) {
       const currentDate = new Date().toISOString().slice(0, 10);
-      returnedAt = formatTimestamp(`${currentDate}T${returnTime}`);
+      returnedAt = formatTimestamp(`${currentDate} ${returnTime}`);
     }
+
     const issuanceDetails = {
-      userId,
-      bookId: selectedBook.id,
-      issuedAt,
-      returnedAt,
-      expectedReturn: formatTimestamp(expectedReturn),
+      user_id,
+      book_id: selectedBook.id,
+      issue_date:expectedReturn, //formatTimestamp(issuedAt), // Format issuedAt to the required format
+      return_date:expectedReturn,//formatTimestamp(expectedReturn),
       status: "Issued",
-      issuanceType,
+      issuance_type,
     };
+
     onSubmit(issuanceDetails);
     onClose();
   };
+
   return (
     <div className="issuance-form">
       <h2>
-        Issue Book <br></br>
+        Issue Book <br />
         <span>{selectedBook.title}</span>
       </h2>
       <form onSubmit={handleSubmit}>
@@ -83,10 +92,10 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
         <div className="form-group">
           <label>Issuance Type</label>
           <select
-            value={issuanceType}
+            value={issuance_type}
             onChange={(e) => setIssuanceType(e.target.value)}
           >
-            <option value="Home">Home</option>
+            <option value="In House">In house</option>
             <option value="Library">Library</option>
           </select>
         </div>
@@ -99,9 +108,10 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
             required
           />
         </div>
-        <Button className="submit-button" text="Issue Book" />
+        <CustomButton className="submit-button" name="Issue Book" />
       </form>
     </div>
   );
 };
+
 export default IssuanceForm;

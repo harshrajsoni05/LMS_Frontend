@@ -1,12 +1,16 @@
 import  { useState, useEffect } from "react";
-import "../styles/dashboard.css"; // Import CSS for styling
+import axios from "axios";
+
+import "../styles/dashboard.css"; 
 
 import books from "../assets/images/books.png";
 import categories from "../assets/images/categories.png";
 import democracy from "../assets/images/democracy.png";
 import userss from "../assets/images/userss.png";
+
 import withLayout from "../hocs/WithLayoutComponent";
-import axios from "axios";
+
+
 
 const LatestBooks = ({ books }) => {
   return (
@@ -25,6 +29,7 @@ const LatestBooks = ({ books }) => {
 };
 
 const Dashboard = () => {
+
   const [data, setData] = useState({
     booksCount: 0,
     categoriesCount: 0,
@@ -33,6 +38,8 @@ const Dashboard = () => {
   });
 
   const [latestBooks, setLatestBooks] = useState([]);
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -43,10 +50,10 @@ const Dashboard = () => {
         ]);
 
         setData({
-          booksCount: dashboardResponse.data.booksCount,
-          categoriesCount: dashboardResponse.data.categoriesCount,
-          issuancesCount: dashboardResponse.data.issuancesCount,
-          usersCount: dashboardResponse.data.usersCount,
+          booksCount:       dashboardResponse.data.booksCount,
+          categoriesCount:  dashboardResponse.data.categoriesCount,
+          issuancesCount:   dashboardResponse.data.issuancesCount,
+          usersCount:       (dashboardResponse.data.usersCount-1),
         });
 
         setLatestBooks(booksResponse.data);
@@ -83,11 +90,13 @@ const Dashboard = () => {
         <p>{data.issuancesCount}</p>
       </div>
       
-      <div className="recent-books-heading">
-        <h2>Recently Added Collection</h2>
-      </div>
-      <LatestBooks books={latestBooks} />
+      
     </div>
+    <div className="recent-books-heading">
+        <p>Recently Added Collection</p>
+      </div>
+    <LatestBooks books={latestBooks} />
+    
   </div>
   );
 };

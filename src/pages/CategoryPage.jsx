@@ -11,6 +11,7 @@ import Dynamicform from "../components/dynamicform";
 import EditIcon from "../assets/images/editicon.png";
 import DeleteIcon from "../assets/images/deleteicon.png";
 import Tooltip from "../components/toolTip";
+import Toast from "../components/toast/toast";
 
 const useDebouncedValue = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -41,6 +42,20 @@ function CategoryPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 500);
 
+  const [showToast, setShowToast] = useState(false);
+  const [toastType, setToastType] = useState('success');
+  const [toastMessage, setToastMessage] = useState('');
+  const showSuccessToast = (message) => {
+    setToastType('success');
+    setToastMessage(message);
+    setShowToast(true);
+  };
+  const showFailureToast = (message) => {
+    setToastType('failure');
+    setToastMessage(message);
+    setShowToast(true);
+  };
+
   const getCategories = async () => {
     try {
       const data = await fetchCategories(currentPage, pageSize, debouncedSearchTerm.trim());
@@ -66,6 +81,8 @@ function CategoryPage() {
 
       getCategories();
       handleCloseModal();
+      showSuccessToast("Category added successfully!");
+
     } catch (error) {
       console.error("Failed to add category:", error.message);
     }
@@ -82,6 +99,8 @@ function CategoryPage() {
       await updateCategory(currentData.id, categoryToUpdate);
       getCategories();
       handleCloseModal();
+      showSuccessToast("Category Edited!");
+
     } catch (error) {
       console.error("Failed to update category:", error);
     }
@@ -91,8 +110,11 @@ function CategoryPage() {
     try {
       await deleteCategory(id);
       setCategories(categories.filter((category) => category.id !== id));
+      showSuccessToast("Category Deleted Succesfully!");
+
     } catch (error) {
       console.error("Failed to delete the category", error);
+      showFailureToast("Cannot Delete Category!")
     }
   };
 
@@ -150,14 +172,14 @@ function CategoryPage() {
         />
       </Tooltip>
 
-      {/* <Tooltip message="Delete">
+      <Tooltip message="Delete">
         <img
           src={DeleteIcon}
           alt="Delete"
           className="action-icon"
           onClick={() => handleDelete(rowData.id)}
         />
-      </Tooltip> */}
+      </Tooltip>
     </div>
   );
 
@@ -225,6 +247,13 @@ function CategoryPage() {
           defaultValues={currentData} // Pass currentData as defaultValues
         />
       </CustomModal>
+      {showToast && (
+          <Toast
+            type={toastType}
+            message={toastMessage}
+            onClose={() => setShowToast(false)}
+          />
+        )}
     </>
   );
 }

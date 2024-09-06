@@ -70,7 +70,6 @@ h1 {
 
 .action-buttons {
   display: flex;
-  gap: 1rem;
  
 }
 
@@ -83,5 +82,5 @@ h1 {
 }
 
 .action-icon:hover {
-  transform: scale(1.1);
+  transform: scale(1.25);
 }

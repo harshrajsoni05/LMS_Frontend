@@ -5,10 +5,10 @@
 }
 
 .search-input {
-  height: 0.6rem;
+  height: 2.5rem;
   background-color: #e6ecf5;
   padding: 1rem 3rem 1rem 1rem; 
-  border-radius: 1rem;
+  border-radius: 10px;
   width: 25rem;
   font-size: 1rem;
   border-color:#c1d0e7;

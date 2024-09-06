@@ -2,11 +2,17 @@
 .btn{ 
   font-size:1rem;
   text-align: center;
-  background-color: #8f82b7; /* Example background color */
-  border-radius: 0.5rem;
+  background-color: #6583b7; 
+  border-radius: 5px;
+  padding:0.5rem 1rem;
+  margin:0.5rem 0.5rem;
   cursor: pointer;
   border:none;
   color:#FFF;
-  transition: background-color 0.3s ease; /* Smooth transition effect */
+  transition: transform 0.3s ease ,background-color 0.3s ease;
 
 }
+.btn:hover{
+  transform:scale(1.1);
+}
+

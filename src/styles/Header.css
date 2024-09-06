@@ -47,7 +47,7 @@
   display: flex;
   align-items: center;
   color: #fff;
-  position: relative; /* Needed for positioning dropdown */
+  position: relative; 
 }
 
 .navbar-user p {

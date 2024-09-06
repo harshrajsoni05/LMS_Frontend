@@ -8,6 +8,7 @@ import '../styles/LoginForm.css'
 
 // Components
 import CustomButton from '../components/button'
+import Toast from './toast/toast';
 
 // Functions
 import { login } from '../api/Auth'
@@ -15,7 +16,6 @@ import { loginUser } from '../redux/authActions'
 import { validateEmailOrMobile, validatePassword } from '../components/utils'
 
 
-// Constants
 
 
 
@@ -37,6 +37,19 @@ const LoginForm = () => {
   const [placeholderText, setPlaceholderText] = useState("Enter Phone Number");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [showToast, setShowToast] = useState(false);
+  const [toastType, setToastType] = useState('success');
+  const [toastMessage, setToastMessage] = useState('');
+  const showSuccessToast = (message) => {
+    setToastType('success');
+    setToastMessage(message);
+    setShowToast(true);
+  };
+  const showFailureToast = (message) => {
+    setToastType('failure');
+    setToastMessage(message);
+    setShowToast(true);
+  };
 
   const [errors, setErrors] = useState(initialErrors);
 
@@ -81,10 +94,11 @@ const LoginForm = () => {
       const { data } = await login(username, password);
       dispatch(loginUser(data));
       window.localStorage.setItem('jwtToken', data.jwtToken);
-      
+      showSuccessToast("Login Successful!");
+
     } catch (error) {
       setErrors(error);
-
+      showFailureToast("Invalid Credentials")
       console.log(error);
     }
 
@@ -163,6 +177,13 @@ const LoginForm = () => {
           Login
         </button>
       </form>
+      {showToast && (
+          <Toast
+            type={toastType}
+            message={toastMessage}
+            onClose={() => setShowToast(false)}
+          />
+        )}
     </div>
   );
 }

@@ -13,6 +13,7 @@ import { useEffect } from 'react';
 import { loginUser } from './redux/authActions';
 import { getCurrentUser } from './api/Auth';
 import { UserHistoryWithLayout } from './pages/User/UserHistory';
+import { HistoryWithLayout } from './pages/history';
 
 function App() {
   const navigate = useNavigate();
@@ -20,7 +21,6 @@ function App() {
 
   useEffect(() => {
     const jwtToken = window.localStorage.getItem('jwtToken');
-    console.log('jwtToken in the getcurrentUser ->', jwtToken);
     
     if (jwtToken) {
       loadUser(jwtToken);
@@ -34,7 +34,6 @@ function App() {
       const { data } = await getCurrentUser();
       dispatch(loginUser(data));
       window.localStorage.setItem('jwtToken', data.jwtToken);
-      console.log("APP ->", data);
     } catch (error) {
       console.log(error);
       navigate('/');
@@ -86,6 +85,30 @@ function App() {
         element={
           <AdminRoute>
             <UserwithLayout/>
+          </AdminRoute>
+        }
+      />
+      <Route 
+        path='/history/:bookId' 
+        element={
+          <AdminRoute>
+            <HistoryWithLayout />  
+          </AdminRoute>
+        }
+      />
+      <Route 
+        path='/history/book/:bookId' 
+        element={
+          <AdminRoute>
+            <HistoryWithLayout />  
+          </AdminRoute>
+        }
+      />
+      <Route 
+        path='/history/user/:userId' 
+        element={
+          <AdminRoute>
+            <HistoryWithLayout />  
           </AdminRoute>
         }
       />
