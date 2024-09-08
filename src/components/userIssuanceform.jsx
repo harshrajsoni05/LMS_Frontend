@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { findBookSuggestions } from "../api/BookServices";
 import "../styles/Issuanceform.css";
-import Button from "./button";
-import { formatTimestamp } from "./utils";
+import CustomButton from "./button";
+import { formatTimestamp } from "./utils"; 
 
 const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
   const [bookTitle, setBookTitle] = useState("");
   const [book_id, setBookId] = useState(null);
   const [issuance_type, setIssuanceType] = useState("In House");
-  const [returnDate, setReturnDate] = useState("");
-  const [returnTime, setReturnTime] = useState("");
-  const [issuedAt] = useState(formatTimestamp(new Date().toLocaleString())); //
-  const [expectedReturn, setExpectedReturn] = useState("");
+  const [expectedReturn, setExpectedReturn] = useState(""); 
+  const [issuedAt] = useState((new Date())); 
   const [errorMessage, setErrorMessage] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [bookSuggestions, setBookSuggestions] = useState([]);
@@ -24,7 +22,6 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
     }
     try {
       const suggestions = await findBookSuggestions(query);
-      console.log("Suggestions: ", suggestions);
       setBookSuggestions(suggestions);
       setShowDropdown(true);
     } catch (error) {
@@ -32,49 +29,58 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
       setBookSuggestions([]);
     }
   };
+
   const handleBookTitleChange = (e) => {
     const title = e.target.value;
     setBookTitle(title);
+    setBookId(null);
     fetchBookSuggestions(title);
   };
+
   const handleSuggestionClick = (book) => {
     setBookTitle(book.title);
     setBookId(book.id);
     setErrorMessage("");
     setShowDropdown(false);
   };
+
   const handleSubmit = (event) => {
     event.preventDefault();
+
     if (!book_id) {
-      setErrorMessage("Please enter a valid Title and try again.");
+      setErrorMessage("Please enter a valid book title and try again.");
       return;
     }
+
     let returnedAt = null;
-    if (issuance_type === "Home" && expectedReturn) {
-      returnedAt = formatTimestamp(new Date(expectedReturn).toLocaleString());
+    if (issuance_type === "In House" && expectedReturn) {
+      returnedAt = formatTimestamp(expectedReturn); 
+    } else if (issuance_type === "Library" && expectedReturn) {
+      const currentDate = new Date().toISOString().slice(0, 10); 
+      returnedAt = formatTimestamp(`${currentDate} ${expectedReturn}`); 
     }
-    else if (issuance_type === "Library" && returnTime) {
-      const currentDate = new Date().toISOString().slice(0, 10);
-      returnedAt = formatTimestamp(
-        new Date(`${currentDate}T${returnTime}`).toLocaleString()
-      );
-    }
+
     const issuanceDetails = {
       user_id: selectedUser.id,
       book_id,
-      issue_date: null,
+      issue_date: issuedAt, 
       return_date: returnedAt,
       status: "Issued",
       issuance_type,
     };
-    console.log(issuanceDetails);
+
+    console.log("Issuance details submitted:", issuanceDetails);
     onSubmit(issuanceDetails);
     onClose();
   };
+
+  const todayDate = new Date().toISOString().split("T")[0];
+  const now = new Date().toISOString().slice(0, 16); // Current date and time for min
+
   return (
     <div className="issuance-form">
       <h2>
-        Issue User <br />
+        Issue Book to User <br />
         <span>{selectedUser.name}</span>
       </h2>
       <form onSubmit={handleSubmit}>
@@ -85,6 +91,7 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
             value={bookTitle}
             onChange={handleBookTitleChange}
             placeholder="Enter Book Title"
+            
           />
           {showDropdown && bookSuggestions.length > 0 && (
             <ul className="dropdown-suggestions">
@@ -97,37 +104,47 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
           )}
           {errorMessage && <p className="error-message">{errorMessage}</p>}
         </div>
+
         <div className="form-group">
           <label>Issuance Type</label>
           <select
             value={issuance_type}
             onChange={(e) => setIssuanceType(e.target.value)}
           >
-            <option value="Home">Home</option>
-            <option value="Library">Library</option>
+            <option value="In House">Takeaway</option>
+            <option value="Library">In House</option>
           </select>
         </div>
-        <div className="form-group">
-          <label>Expected Return</label>
-          {issuance_type === "Library" ? (
+
+        {issuance_type === "In House" ? (
+          <div className="form-group">
+            <label>Expected Return Date & Time</label>
             <input
               type="datetime-local"
               value={expectedReturn}
               onChange={(e) => setExpectedReturn(e.target.value)}
-              required
+              min={now}
+              
             />
-          ) : (
+          </div>
+        ) : (
+          <div className="form-group">
+            <label>Expected Return Time</label>
             <input
               type="time"
-              value={returnTime}
-              onChange={(e) => setReturnTime(e.target.value)}
-              required={issuance_type === "In House"}
+              value={expectedReturn}
+              onChange={(e) => setExpectedReturn(e.target.value)}
+              
+              min={todayDate}
+
             />
-          )}
-        </div>
-        <Button className="submit-button" text="Issue Book" />
+          </div>
+        )}
+
+        <CustomButton className="submit-button" name="Issue Book" />
       </form>
     </div>
   );
 };
+
 export default UserIssuanceform;

@@ -71,3 +71,17 @@
 .custom-table th .react-icon.desc {
   color: #fff; 
 }
+
+
+@media (max-width: 768px) {
+  .custom-table {
+    font-size: 0.875rem;
+    margin-top:0;
+  }
+
+  .custom-table th, .custom-table td {
+    padding: 0.5rem;
+  }
+
+ 
+}

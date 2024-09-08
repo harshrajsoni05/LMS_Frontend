@@ -1,4 +1,3 @@
-/* Base styles for larger screens */
 
 .dashboard {
   display: grid;
@@ -100,18 +99,33 @@
   margin-top:3%;
 }
 
-/* Responsive styles for tablets (around 768px) */
 @media (max-width: 768px) {
+
+  .dashboard-card {
+    padding: 1.5rem;
+    margin: 1rem;
+    height: auto; 
+    width: 100%; 
+  }
+
+
+  .latest-books-container {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
+
   .dashboard {
+    grid-template-columns: repeat(2, 1fr); 
+    justify-content: center; 
     padding-right: 1.5rem;
     padding-left: 1.5rem;
   }
 
   .dashboard-card {
-    padding: 1.5rem;
-    margin: 1rem;
-    height: auto; /* Adjust height based on content */
-    width: 100%; /* Full width for cards on smaller screens */
+    padding: 1rem;
+    height: auto; 
+    width: auto; 
   }
 
   .dashboard-card h2 {
@@ -122,20 +136,16 @@
     font-size: 1.1rem;
   }
 
-  .latest-books-container {
-    margin-left: 1rem;
-    margin-right: 1rem;
-    gap: 0.5rem; /* Reduce gap for smaller screens */
-  }
 
+  
   .book-card {
-    width: 8rem; /* Adjust width for smaller screens */
-    padding: 0.5rem;
+    width: 80%;
+    height:auto;
   }
 
   .book-image {
-    width: 6rem; /* Smaller image size for tablets */
-    height: 8rem;
+    width: 50%; 
+    height: auto; 
   }
 
   .book-title {
@@ -146,7 +156,7 @@
     font-size: 0.6rem;
   }
 
-  .recent-books-heading h2 {
+  .recent-books-heading p {
     font-size: 0.9rem;
   }
 }

@@ -3,7 +3,7 @@
   text-align: center;
   
   font-size:1rem;
-  margin: 0 auto; /* Centers the form horizontally within its container */
+  margin: 0 auto; 
 }
 
 ::placeholder {
@@ -17,7 +17,7 @@ div.role-selection {
   align-items: center;
   color: #fff;
   text-transform: uppercase;
-  margin-bottom: 20px; /* Adds space below the role selection */
+  margin-bottom: 20px; 
 }
 
 .login-form h2 {
@@ -45,7 +45,7 @@ div.role-selection {
   border: 1px solid #ccc;
   border-radius: 30px;
   font-size: 0.8rem;
-  color: #333; /* Text color inside the input */
+  color: #333; 
 }
 
 .login-btn {
@@ -54,7 +54,7 @@ div.role-selection {
   text-align: center;
   text-transform: uppercase;
   padding: 10px 30px;
-  margin: 20px auto; /* Centers the button horizontally */
+  margin: 20px auto;
   background-color: #6583b7;
   border-radius: 30px;
   cursor: pointer;
@@ -64,7 +64,7 @@ div.role-selection {
 }
 
 .login-btn:hover {
-  background-color: #506da1; /* Darker shade for hover effect */
+  background-color: #506da1;
   transform: scale(1.05);
 }
 
@@ -73,24 +73,22 @@ div.role-selection {
   font-size: 14px;
 }
 
-/* Hide the radio buttons */
 .role-selection input[type="radio"] {
   display: none;
 }
 
-/* Style the switch */
 .switch {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 12rem; /* Adjusted width for better spacing */
-  height: 1.75rem; /* Adjusted height */
+  width: 12rem; 
+  height: 1.75rem; 
   border-radius: 30px;
   padding: 5px;
   position: relative;
-  background-color: #a1bedc; /* Background color for switch container */
-  margin: 0 auto; /* Centers the switch horizontally */
-  overflow: hidden; /* Ensures the slider doesn't overflow the container */
+  background-color: #a1bedc;
+  margin: 0 auto; 
+  overflow: hidden; 
 }
 
 .switch-label {
@@ -100,30 +98,28 @@ div.role-selection {
   cursor: pointer;
   z-index: 1;
   font-weight: bold;
-  color: #fff; /* Text color for better contrast */
+  color: #fff; 
 }
 
-/* The slider element */
+
 .slider {
   position: absolute;
   border-radius: 30px;
-  width: 50%; /* Width of the slider as a percentage of the switch width */
+  width: 50%; 
   height: 100%;
   background-color: #6583b7;
   transition: transform 0.3s ease;
   z-index: 0;
 }
 
-/* Adjust slider position based on the selected input */
 input#user:checked ~ .switch .slider {
-  transform: translateX(0); /* Slider stays on the left */
+  transform: translateX(0);
 }
 
 input#admin:checked ~ .switch .slider {
-  transform: translateX(93%); /* Slider moves fully to the right */
+  transform: translateX(93%); 
 }
 
-/* Hide the actual radio buttons */
 input[type="radio"] {
   display: none;
 }

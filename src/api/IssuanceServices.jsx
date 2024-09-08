@@ -2,7 +2,7 @@ import axiosInstance from "./AxiosInstance";
 
 const API_BASE_URL = "/issuances";
 
-const fetchIssuances = async (page = 0, pagesize = 10, search = "") => {
+const fetchIssuances = async (page = 0, pagesize = 7, search = "") => {
   try {
     const trimmedSearchTerm = search.trim(); 
     const response = await axiosInstance.get(`${API_BASE_URL}`, {

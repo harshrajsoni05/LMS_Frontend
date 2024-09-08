@@ -1,9 +1,8 @@
-/* Center the container on the page */
 .container-loginpage {
-    display:flex;
+    display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Full height of the viewport */
+    height: 100vh;
     background-color: #f0f6fc;
     margin: 0;
     padding: 0;
@@ -12,7 +11,7 @@
 .login-page {
     background-color: #839bc5;
     display: flex;
-    width: 55vw; 
+    width: 55vw;
     border-radius: 20px;
     color: #6583b7;
     overflow: hidden;
@@ -84,4 +83,31 @@
     font-size: 1rem;
     margin-bottom: 25px;
     color: #6583b7;
+}
+
+@media (max-width: 768px) {
+   
+
+    .login-left {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .login-right {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .login-form {
+        width: 100%;
+        padding: 1rem;
+    }
+
+    .login-content h2 {
+        font-size: 0.9rem;
+    }
+
+    .login-content p {
+        font-size: 0.9rem;
+    }
 }

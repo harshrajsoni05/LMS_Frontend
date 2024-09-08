@@ -1,20 +1,22 @@
+import React from 'react';
 import '../styles/Modal.css';
 
-const Modal = ({isOpen , onClose , children}) => {
+const Modal = ({ isOpen, onClose, children, height, width }) => {
+  if (!isOpen) return null;
 
-  if(!isOpen) return null;
-
-return (
-   <div className="modal-overlay">
-      <div className="modal-content">
-          <button className="modal-close" onClick={onClose}> 
-              &times; 
-          </button>
-
-          {children}
+  return (
+    <div className="modal-overlay">
+      <div 
+        className="modal-content" 
+        style={{ height: height || 'auto', width: width || 'auto' }}
+      >
+        <button className="modal-close" onClick={onClose}> 
+          &times; 
+        </button>
+        {children}
       </div>
-   </div>
-);
+    </div>
+  );
 };
 
-export default Modal
+export default Modal;

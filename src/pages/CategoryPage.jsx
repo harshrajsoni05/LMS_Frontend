@@ -6,29 +6,15 @@ import Table from "../components/table";
 import Searchbar from "../components/searchbar";
 import back from "../assets/images/go-back.png";
 import next from "../assets/images/go-next.png";
-import WithLayoutComponent from "../hocs/WithLayoutComponent";
+import HOC from "../hocs/WithLayoutComponent";
 import Dynamicform from "../components/dynamicform";
 import EditIcon from "../assets/images/editicon.png";
 import DeleteIcon from "../assets/images/deleteicon.png";
 import Tooltip from "../components/toolTip";
 import Toast from "../components/toast/toast";
 
-const useDebouncedValue = (value, delay) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
 
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler); // Cleanup on component unmount or value change
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-};
-function CategoryPage() {
+const CategoryPage = ()=> {
   const [categories, setCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState(""); // 'edit' or 'add'
@@ -37,10 +23,9 @@ function CategoryPage() {
     description: "",
   });
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(7);
   const [totalPages, setTotalPages] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useDebouncedValue(searchTerm, 500);
 
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('success');
@@ -58,17 +43,17 @@ function CategoryPage() {
 
   const getCategories = async () => {
     try {
-      const data = await fetchCategories(currentPage, pageSize, debouncedSearchTerm.trim());
+      const data = await fetchCategories(currentPage, pageSize, searchTerm.trim());
       setCategories(data.content || []);
       setTotalPages(data.totalPages || 0);
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      showFailureToast("Can't Fetch Categories");
     }
   };
 
   useEffect(() => {
     getCategories();
-  }, [currentPage, debouncedSearchTerm]);
+  }, [currentPage, searchTerm]);
 
   const handleAddCategory = async (newCategory) => {
     try {
@@ -84,7 +69,9 @@ function CategoryPage() {
       showSuccessToast("Category added successfully!");
 
     } catch (error) {
-      console.error("Failed to add category:", error.message);
+
+      showFailureToast("Failed to add category")
+      
     }
   };
 
@@ -102,7 +89,8 @@ function CategoryPage() {
       showSuccessToast("Category Edited!");
 
     } catch (error) {
-      console.error("Failed to update category:", error);
+      showSuccessToast("Category Edit Failed!");
+
     }
   };
 
@@ -113,8 +101,7 @@ function CategoryPage() {
       showSuccessToast("Category Deleted Succesfully!");
 
     } catch (error) {
-      console.error("Failed to delete the category", error);
-      showFailureToast("Cannot Delete Category!")
+      showFailureToast("Cannot Delete Category as it has Issued Books!")
     }
   };
 
@@ -149,7 +136,7 @@ function CategoryPage() {
       handleAddCategory(data);
     } else if (modalType === "edit") {
       handleEditCategory(data);
-    }
+    } 
   };
 
   const columns = [
@@ -177,7 +164,7 @@ function CategoryPage() {
           src={DeleteIcon}
           alt="Delete"
           className="action-icon"
-          onClick={() => handleDelete(rowData.id)}
+          onClick={() => handleOpenModal("delete",rowData.id)}
         />
       </Tooltip>
     </div>
@@ -223,30 +210,39 @@ function CategoryPage() {
         </div>
       </div>
 
-      <CustomModal isOpen={isModalOpen} onClose={handleCloseModal}>
-        <Dynamicform
-          heading={modalType === "edit" ? "Edit Category" : "Add Category"}
-          fields={[
-            {
-              name: "name",
-              type: "text",
-              placeholder: "Category Name",
-              required: true,
-              defaultValue: currentData.name,
-            },
-            {
-              name: "description",
-              type: "text-area",
-              placeholder: "Description",
-              required: false,
-              defaultValue: currentData.description,
-            },
-          ]}
-          
-          onSubmit={handleSubmitModal}
-          defaultValues={currentData} // Pass currentData as defaultValues
-        />
-      </CustomModal>
+      <CustomModal isOpen={isModalOpen} onClose={handleCloseModal} >
+  {modalType === "edit" || modalType === "add" ? (
+    <Dynamicform
+      heading={modalType === "edit" ? "Edit Category" : "Add Category"}
+      fields={[
+        { label:"Name",
+          name: "name",
+          type: "text",
+          placeholder: "Category Name",
+          required: true,
+          defaultValue: currentData.name,
+        },
+        { label:"Description",
+          name: "description",
+          type: "text-area",
+          placeholder: "Description",
+          required: false,
+          defaultValue: currentData.description,
+        },
+      ]}
+      onSubmit={handleSubmitModal}
+      defaultValues={currentData} 
+    />
+  ) : modalType === "delete" ? (
+    <div className="confirmation">
+      <p>Are you sure you want to delete this Category?</p>
+      <div className="confirmation-buttons">
+      <CustomButton onClick={() => handleDelete(currentData)} name="Yes"></CustomButton>
+      <CustomButton onClick={handleCloseModal} name="No"></CustomButton></div>
+    </div>
+  ) : null} {}
+</CustomModal>
+
       {showToast && (
           <Toast
             type={toastType}
@@ -258,5 +254,5 @@ function CategoryPage() {
   );
 }
 
-export const CategorywithLayout = WithLayoutComponent(CategoryPage);
-export default useDebouncedValue;
+
+export default HOC(CategoryPage);

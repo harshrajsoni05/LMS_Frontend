@@ -3,21 +3,16 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-// CSS
+//CSS
 import '../styles/LoginForm.css'
 
-// Components
-import CustomButton from '../components/button'
+//Components
 import Toast from './toast/toast';
 
-// Functions
+//Functions
 import { login } from '../api/Auth'
 import { loginUser } from '../redux/authActions'
 import { validateEmailOrMobile, validatePassword } from '../components/utils'
-
-
-
-
 
 const initialErrors = {
   username: '',
@@ -25,10 +20,8 @@ const initialErrors = {
 }
 
 const LoginForm = () => {
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const auth = useSelector(state => state.auth);
 
   const [role, setRoleState] = useState('user'); 
@@ -36,24 +29,24 @@ const LoginForm = () => {
   const [password, setPassword] = useState('')
   const [placeholderText, setPlaceholderText] = useState("Enter Phone Number");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('success');
   const [toastMessage, setToastMessage] = useState('');
+  const [errors, setErrors] = useState(initialErrors);
+
   const showSuccessToast = (message) => {
     setToastType('success');
     setToastMessage(message);
     setShowToast(true);
   };
+
   const showFailureToast = (message) => {
     setToastType('failure');
     setToastMessage(message);
     setShowToast(true);
   };
 
-  const [errors, setErrors] = useState(initialErrors);
-
-  useEffect (() => {
+  useEffect(() => {
     if (auth && auth.jwtToken) {
       if (auth.role === 'ROLE_ADMIN') {
         navigate('/dashboard');
@@ -66,23 +59,38 @@ const LoginForm = () => {
   const validateLogin = () => {
     let isValid = true;
     const newErrors = { username: '', password: '' };
-  
+
     if (!validateEmailOrMobile(username)) {
       newErrors.username = 'Enter a valid email or mobile number.';
       isValid = false;
     }
-  
+
     if (!validatePassword(password)) {
-      newErrors.password = "Please enter a valid Password";
+      newErrors.password = 'Please enter a valid Password';
       isValid = false;
     }
-  
+
     if (!isValid) {
       setErrors(newErrors);
     }
-  
+
     return isValid;
-  }
+  };
+
+  const handleBlur = (field) => {
+    const newErrors = { ...errors };
+
+    if (field === 'username' && !validateEmailOrMobile(username)) {
+      newErrors.username = 'Enter a valid email or mobile number.';
+    } else if (field === 'password' && !validatePassword(password)) {
+      newErrors.password = 'Please enter a valid Password';
+    } else {
+      newErrors[field] = '';
+    }
+
+    setErrors(newErrors);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -91,32 +99,26 @@ const LoginForm = () => {
     }
 
     try {
-      const { data } = await login(username, password);
+      const EncodedPassword = btoa(password);
+      const { data } = await login(username, EncodedPassword);
       dispatch(loginUser(data));
       window.localStorage.setItem('jwtToken', data.jwtToken);
-      showSuccessToast("Login Successful!");
-
+      showSuccessToast('Login Successful!');
     } catch (error) {
-      setErrors(error);
-      showFailureToast("Invalid Credentials")
+      showFailureToast('Invalid Credentials');
       console.log(error);
     }
-
-  }
-
+  };
 
   useEffect(() => {
-    setPlaceholderText(role === "admin" ? "Enter Email" : "Enter Phone Number");
+    setPlaceholderText(role === 'admin' ? 'Enter Email' : 'Enter Phone Number');
   }, [role]);
-
-
 
   const handleRoleChange = (event) => {
     setRoleState(event.target.value);
-    setUsername("");
-    setPassword("");
+    setUsername('');
+    setPassword('');
   };
-
 
   return (
     <div className="login-form">
@@ -153,6 +155,7 @@ const LoginForm = () => {
             id="username"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
+            onBlur={() => handleBlur('username')}
             placeholder={placeholderText}
             className={errors.username ? 'error' : ''}
           />
@@ -162,30 +165,30 @@ const LoginForm = () => {
         <div className="input-group">
           <label htmlFor="password" className="visually-hidden"></label>
           <input
-            type="password" 
+            type="password"
             id="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            onBlur={() => handleBlur('password')}
             placeholder="Password"
             className={errors.password ? 'error' : ''}
           />
           {errors.password && <p className="error-text">{errors.password}</p>}
         </div>
-        {errors.submit && <p className="error-text">{errors.submit}</p>}
 
         <button type="submit" className="login-btn" disabled={isSubmitting}>
           Login
         </button>
       </form>
       {showToast && (
-          <Toast
-            type={toastType}
-            message={toastMessage}
-            onClose={() => setShowToast(false)}
-          />
-        )}
+        <Toast
+          type={toastType}
+          message={toastMessage}
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </div>
   );
-}
+};
 
 export default LoginForm;

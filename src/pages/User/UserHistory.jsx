@@ -38,27 +38,48 @@ function UserHistoryPage( ) {
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) {
-        return "Pending Return"; 
-    }
-    const date = new Date(dateString);
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return date.toLocaleDateString(undefined, options);
-  };
+
 
   const columns = [
     { header: "S No.", accessor: "serialNo" },
     { header: "Book", render: (rowData) => rowData?.books?.title || "N/A" },
+
+    { header: "User", render: (rowData) => rowData?.users?.name || "N/A" },
     { header: "Status", accessor: "status" },
-    { header: "Issuance Type", accessor: "issuance_type" },
+    {
+      header: "Issuance Type", 
+      render: (rowData) => rowData.issuance_type === "In House" ? "Takeaway" : "In House",
+    },
     {
       header: "Issue Date",
-      render: (rowData) => formatDate(rowData.issue_date),
+      render: (rowData) => {
+        if (rowData.issuance_type === "Library") {
+          const issueTime = new Date(rowData.issue_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          return issueTime;
+        }
+        const issueDate = new Date(rowData.issue_date).toLocaleDateString(undefined, {
+          year: 'numeric', month: 'long', day: 'numeric',
+        });
+        return issueDate;
+      },
     },
     {
       header: "Return Date",
-      render: (rowData) => formatDate(rowData.return_date),
+      render: (rowData) => {
+        if (!rowData.return_date) {
+          return "Pending";
+        }
+        if (rowData.issuance_type === "In House") {
+          const returnDate = new Date(rowData.return_date).toLocaleDateString(undefined, {
+            year: 'numeric', month: 'long', day: 'numeric',
+          });
+          return returnDate;
+        } else if (rowData.issuance_type === "Library") {
+          const returnTime = new Date(rowData.return_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          return returnTime;
+        }
+        return "N/A";
+      },
     },
   ];
 

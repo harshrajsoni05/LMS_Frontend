@@ -1,13 +1,13 @@
 import './styles/App.css'; 
 import LoginPage from './pages/LoginPage';
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import { BookswithLayout } from './pages/BooksPage';
+import BooksPage from './pages/BooksPage';
 import { IssuancewithLayout } from './pages/IssuancePage';
 import { DashboardwithLayout } from './components/dashboard';
-import { CategorywithLayout } from './pages/CategoryPage';
+import CategoryPage from './pages/CategoryPage';
 import { UserwithLayout } from './pages/UserPage';
-import AdminRoute from './components/adminRoute';  // Import AdminRoute
-import UserRoute from './components/userRoute';    // Import UserRoute
+import AdminRoute from './components/adminRoute';  
+import UserRoute from './components/userRoute';    
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import { loginUser } from './redux/authActions';
@@ -44,11 +44,9 @@ function App() {
     <Routes>
       <Route path='/' element={<LoginPage />} />
 
-      <Route 
-        path='/category' 
-        element={
+      <Route path='/category' element={
           <AdminRoute>
-            <CategorywithLayout />
+            <CategoryPage />
           </AdminRoute>
         }
       />
@@ -66,7 +64,7 @@ function App() {
         path='/books' 
         element={
           <AdminRoute>
-            <BookswithLayout />  
+            <BooksPage />  
           </AdminRoute>
         }
       />

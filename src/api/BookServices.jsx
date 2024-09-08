@@ -11,7 +11,7 @@ const fetchAllBooks = async()=>{
 
 }
 
-const fetchBooks = async (page = 0, pagesize = 10, search = "") => {
+const fetchBooks = async (page = 0, pagesize = 7, search = "") => {
   try {
     const trimmedSearchTerm = search.trim(); 
     const response = await axiosInstance.get(`${API_BASE_URL}`, {
@@ -83,7 +83,7 @@ const assignBookToUser = async (bookId, userId) => {
 
 const findBookSuggestions = async (query) => {
   try {
-    const response = await axiosInstance.get(`${API_BASE_URL}`,{
+    const response = await axiosInstance.get(`${API_BASE_URL}/suggestions`,{
       params :{
         query:query
       }

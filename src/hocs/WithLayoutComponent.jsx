@@ -1,19 +1,14 @@
-import { useSelector } from 'react-redux';
 import Header from '../components/header'; 
 import Sidebar from '../components/sidebar';
 import './Hoc.css';
 
-const WithLayoutComponent = (Component) => {
+const HOC = (Component) => {
   return function Hoc(props) {
-
-    const role = useSelector((state) => state.auth.role); 
-    const Name = useSelector((state) => state.auth.name); 
-
     return (
       <div>
-        <Header role={role} userName={Name} />
+        <Header/>
         <div className='dashboard-hoc-container'>
-          <Sidebar role={role} />
+          <Sidebar/>
           <div className='dashboard-hoc-right-container'>
             <Component {...props} />
           </div>
@@ -23,4 +18,4 @@ const WithLayoutComponent = (Component) => {
   };
 };
 
-export default WithLayoutComponent;
+export default HOC;

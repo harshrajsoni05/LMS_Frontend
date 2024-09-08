@@ -8,9 +8,8 @@ import back from '../assets/images/go-back.png';
 import next from '../assets/images/go-next.png';
 
 const History = () => {
-  const { bookId, userId } = useParams(); // Get both bookId and userId from the URL
-  console.log('bookId:', bookId); // Debugging line
-  console.log('userId:', userId); // Debugging line
+  const { bookId, userId } = useParams(); 
+
 
   const [issuances, setIssuances] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -51,20 +50,47 @@ const History = () => {
     return date.toLocaleDateString(undefined, options);
   };
 
-  const columns = [
-    { header: 'S No.', accessor: 'serialNo' },
-    { header: 'Book', render: (rowData) => rowData?.books?.title || 'N/A' },
-    { header: 'User', render: (rowData) => rowData?.users?.name || 'N/A' },
-    { header: 'Status', accessor: 'status' },
-    { header: 'Issuance Type', accessor: 'issuance_type' },
-    {
-      header: 'Issue Date',
-      render: (rowData) => formatDate(rowData.issue_date),
-    },
-    {
-      header: 'Return Date',
-      render: (rowData) => formatDate(rowData.return_date),
-    },
+ 
+    const columns = [
+      { header: "S No.", accessor: "serialNo" },
+      { header: "User", render: (rowData) => rowData?.users?.name || "N/A" },
+      { header: "Book", render: (rowData) => rowData?.books?.title || "N/A" },
+      { header: "Status", accessor: "status" },
+      {
+        header: "Issuance Type", 
+        render: (rowData) => rowData.issuance_type === "In House" ? "Takeaway" : "In House",
+      },
+      {
+        header: "Issue Date",
+        render: (rowData) => {
+          if (rowData.issuance_type === "Library") {
+            const issueTime = new Date(rowData.issue_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return issueTime;
+          }
+          const issueDate = new Date(rowData.issue_date).toLocaleDateString(undefined, {
+            year: 'numeric', month: 'long', day: 'numeric',
+          });
+          return issueDate;
+        },
+      },
+      {
+        header: "Return Date",
+        render: (rowData) => {
+          if (!rowData.return_date) {
+            return "Pending";
+          }
+          if (rowData.issuance_type === "In House") {
+            const returnDate = new Date(rowData.return_date).toLocaleDateString(undefined, {
+              year: 'numeric', month: 'long', day: 'numeric',
+            });
+            return returnDate;
+          } else if (rowData.issuance_type === "Library") {
+            const returnTime = new Date(rowData.return_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            return returnTime;
+          }
+          return "N/A";
+        },
+      },
   ];
 
   return (

@@ -5,10 +5,14 @@ import { useNavigate} from "react-router-dom";
 import admin from '../assets/images/admin.png';
 import user from '../assets/images/user.png';
 import '../styles/Header.css';
+import { useSelector } from 'react-redux';
 
-const Header = ({ role, userName}) => {
+const Header = () => {
   const navigate = useNavigate(); 
   
+  const role = useSelector((state) => state.auth.role);
+  const userName = useSelector((state) => state.auth.name);
+
   const onLogout = async () => {
     try {
       localStorage.removeItem("jwtToken");

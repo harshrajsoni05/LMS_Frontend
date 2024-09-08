@@ -48,7 +48,7 @@ function UsersPage() {
   const [modalType, setModalType] = useState('');
   const [currentData, setCurrentData] = useState({});
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(7);
   const [totalPages, setTotalPages] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedBook, setSelectedBook] = useState(null);
@@ -126,46 +126,31 @@ function UsersPage() {
   
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
       try {
         await deleteUser(id);
         setUsers(users.filter(user => user.id !== id));
+        handleCloseModal()
         showSuccessToast("User Deleted successfully!");
 
       } catch (error) {
-        console.error('Failed to delete the user:', error);
-        showFailureToast("Failed to Delete User")
+        showFailureToast("Failed to delete the user due its issuances!")
 
       }
-    }
+    
   };
 
-  const handleIssueBook = async () => {
-    if (selectedBook && issueDate  && status && issuanceType) {
-      const issuanceDetails = {
-        user_id: currentData.id,
-        book_id: selectedBook.id,
-        issue_date: issueDate,
-        return_date: returnDate || "",
-        status: "Issued",
-        issuance_type: issuanceType,
-      };
-      console.log(issuanceDetails);
-      
-      try {
-        await addIssuance(issuanceDetails);
-        handleCloseModal(); 
-        showSuccessToast("Book Issued successfully!");
-
-      } catch (error) {
-        console.error('Failed to create issuance:', error);
-        showFailureToast("Failed to Issue Book!")
-
-      }
-    } else {
-      console.error('All fields are required to create an issuance');
+  const handleIssueBook = async (issuanceDetails) => {
+    try {
+      await addIssuance(issuanceDetails);
+      handleCloseModal(); 
+      showSuccessToast("Book Issued successfully!");
+    } catch (error) {
+      console.error('Failed to create issuance:', error);
+      showFailureToast("Failed to Issue Book!");
     }
   };
+  
+  
   
 
 
@@ -198,24 +183,17 @@ function UsersPage() {
     setIssuanceType('');
   };
 
-  const generatePassword = (length = 8) => {
-    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@#$';
-    let password = '';
-    for (let i = 0; i < length; i++) {
-      const randomIndex = Math.floor(Math.random() * characters.length);
-      password += characters[randomIndex];
-    }
-    return password;
-  };
+
 
   const handleRegister = async (userdata) => {
   try {
-    const generatedPassword = generatePassword(); 
-    const updatedUserData = { ...userdata,role:"ROLE_USER", password: generatedPassword };
+    const updatedUserData = { ...userdata,role:"ROLE_USER"};
     
     console.log("User registered-> " + JSON.stringify(updatedUserData)) 
     await RegisterUser(updatedUserData);
+
     getUsers();
+
     handleCloseModal();
     showSuccessToast("User Registered successfully!")
   } catch (error) {
@@ -276,7 +254,7 @@ function UsersPage() {
               src={DeleteIcon}
               alt="Delete"
               className="action-icon"
-              onClick={() => handleDelete(rowData.id)}
+              onClick={() => handleOpenModal('delete',rowData.id)}
             />
           </Tooltip>
         </div>
@@ -334,9 +312,9 @@ const handleBookSelection = (e) => {
       <CustomModal isOpen={isModalOpen} onClose={handleCloseModal}>
   {modalType === 'assign' ? (
     <UserIssuanceform
-      onSubmit={handleIssueBook} // Make sure this function handles the form submission
-      selectedUser={currentData} // Pass the selected user details
-      onClose={handleCloseModal} // Function to close the modal
+      onSubmit={handleIssueBook} 
+      selectedUser={currentData} 
+      onClose={handleCloseModal} 
     />
   ) : modalType === 'edit' ? (
     <Dynamicform
@@ -345,8 +323,8 @@ const handleBookSelection = (e) => {
         { name: 'name', type: 'text', placeholder: 'Name', defaultValue: currentData.name },
         { name: 'email', type: 'email', placeholder: 'Email', defaultValue: currentData.email },
         { name: 'number', type: 'text', placeholder: 'Number', defaultValue: currentData.number },
-        { name: 'password', type: 'password', placeholder: 'Password' },
-        { name: 'confirmPassword', type: 'password', placeholder: 'Confirm Password' },
+        { name: 'password', type: 'password', placeholder: 'Change password' },
+        { name: 'confirmPassword', type: 'password', placeholder: 'Confirm Changed Password' },
       ]}
       onSubmit={handleSubmitModal}
       defaultValues={currentData}
@@ -361,7 +339,14 @@ const handleBookSelection = (e) => {
       ]}
       onSubmit={handleSubmitModal}
     />
-  ) : null}
+  ) : modalType === "delete" ? (
+    <div className="confirmation">
+      <p>Are you sure you want to delete this User?</p>
+      <div className="confirmation-buttons">
+      <CustomButton onClick={() => handleDelete(currentData)} name="Yes"></CustomButton>
+      <CustomButton onClick={handleCloseModal} name="No"></CustomButton></div>
+    </div>
+  ) : null }{}
 </CustomModal>
 
 

@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+
 import {
   fetchBooks,
   addBook,
@@ -6,7 +8,7 @@ import {
   deleteBook,
   assignBookToUser,
 } from "../api/BookServices";
-import { fetchAllCategories } from '../api/CategoryServices';
+import { fetchAllCategories } from "../api/CategoryServices";
 import { addIssuance } from "../api/IssuanceServices";
 import useDebouncedValue from "./CategoryPage";
 
@@ -18,6 +20,7 @@ import Searchbar from "../components/searchbar";
 import Dynamicform from "../components/dynamicform";
 import WithLayoutComponent from "../hocs/WithLayoutComponent";
 import Tooltip from "../components/toolTip";
+import Toast from "../components/toast/toast";
 
 //images
 import EditIcon from "../assets/images/editicon.png";
@@ -27,29 +30,28 @@ import back from "../assets/images/go-back.png";
 import next from "../assets/images/go-next.png";
 import AssignUser from "../assets/images/alloticon.png";
 import IssuanceForm from "../components/issuanceform";
+import { modalSizes } from "../components/utils";
+import HOC from "../hocs/WithLayoutComponent";
 
 
-//
-import Toast from "../components/toast/toast";
-import { useNavigate } from "react-router-dom";
 
-function BooksPage() {
+function BooksPage(){
   const navigate = useNavigate();
-
+  
   const [books, setBooks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState(""); // 'edit', 'add', or 'assign'
+  const [modalType, setModalType] = useState("");
   const [currentData, setCurrentData] = useState({
     title: "",
     author: "",
     quantity: "",
     category_id: "",
     userId: "",
-    imageURL:""
+    imageURL: "",
   });
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(7);
   const [totalPages, setTotalPages] = useState(0);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -57,38 +59,43 @@ function BooksPage() {
 
   const [selectedBook, setSelectedBook] = useState(null);
 
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [issuanceType, setIssuanceType] = useState('library');
-  const [isIssuanceModalOpen,setIsIssuanceModalOpen]=useState(false)
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [issuanceType, setIssuanceType] = useState("library");
+  const [isIssuanceModalOpen, setIsIssuanceModalOpen] = useState(false);
   const [userNotRegistered, setUserNotRegistered] = useState(false);
 
   const [showToast, setShowToast] = useState(false);
-  const [toastType, setToastType] = useState('success');
-  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState("success");
+  const [toastMessage, setToastMessage] = useState("");
   const showSuccessToast = (message) => {
-    setToastType('success');
+    setToastType("success");
     setToastMessage(message);
     setShowToast(true);
   };
   const showFailureToast = (message) => {
-    setToastType('failure');
+    setToastType("failure");
     setToastMessage(message);
     setShowToast(true);
   };
-
+  
   const getBooks = async () => {
     try {
-      const data = await fetchBooks(currentPage, pageSize, debouncedSearchTerm.trim());
+      const data = await fetchBooks(
+        currentPage,
+        pageSize,
+        searchTerm.trim()
+      );
       setBooks(data.content || []);
       setTotalPages(data.totalPages || 0);
     } catch (error) {
       console.error("Error fetching books:", error);
     }
+  
   };
 
   useEffect(() => {
     getBooks();
-  }, [currentPage, debouncedSearchTerm]);
+  }, [currentPage, searchTerm]);
 
   const getCategories = async () => {
     try {
@@ -130,12 +137,12 @@ function BooksPage() {
         author: updatedBook.author,
         category_id: parseInt(updatedBook.category_id, 10),
         quantity: parseInt(updatedBook.quantity, 10),
+        imageURL: updatedBook.imageURL,
       };
       await updateBook(currentData.id, bookToUpdate);
       getBooks();
       handleCloseModal();
       showSuccessToast("Book edited Successfully!");
-
     } catch (error) {
       console.error("Failed to update book:", error);
     }
@@ -143,37 +150,34 @@ function BooksPage() {
 
   const handleDelete = async (rowData) => {
     const id = rowData.id;
-      try {
-        await deleteBook(id);
-        setBooks(books.filter((book) => book.id !== id));
-        showSuccessToast("Book deleted Successfully!");
-        handleCloseModal();
-
-      } catch (error) {
-        console.error("Failed to delete the book", error);
-      }
-    
+    try {
+      await deleteBook(id);
+      setBooks(books.filter((book) => book.id !== id));
+      showSuccessToast("Book deleted Successfully!");
+      handleCloseModal();
+    } catch (error) {
+      console.error("Failed to delete the book", error);
+      showFailureToast("Cannot delete Book has been Issued!");
+    }
   };
 
   const handleIssuanceSubmit = async (issuanceDetails) => {
     try {
-        console.log(issuanceDetails);
-       const response = await addIssuance(issuanceDetails);
-       console.log(response);
+      console.log(issuanceDetails);
+      const response = await addIssuance(issuanceDetails);
+      console.log(response);
       if (response === "Issuance already exists for this user and book.") {
-          alert(response);
+        alert(response);
+      } else if (response === "No copies available for the selected book.") {
+        alert(response);
       }
-      else if (response==="No copies available for the selected book."){
-             alert(response);
-      }
-      
+
       getBooks();
       showSuccessToast("Issued book Successfully!");
-
-  } catch (error) {
+    } catch (error) {
       console.error("Failed to create issuance:", error);
       showFailureToast("Failed Issuance!");
-  }
+    }
   };
 
   const handleSearchChange = (e) => {
@@ -203,10 +207,10 @@ function BooksPage() {
       quantity: "",
       category_id: "",
       userId: "",
-      imageURL:""
+      imageURL: "",
     });
-    setPhoneNumber('');
-    setIssuanceType('library');
+    setPhoneNumber("");
+    setIssuanceType("library");
     setUserNotRegistered(false);
   };
 
@@ -237,7 +241,7 @@ function BooksPage() {
         <img
           src={AssignUser}
           alt="Assign User"
-          style={{ paddingLeft: '0' }}
+          style={{ paddingLeft: "0" }}
           className="action-icon"
           onClick={() => handleOpenModal("assign", rowData)}
         />
@@ -251,27 +255,26 @@ function BooksPage() {
           onClick={() => handleOpenModal("edit", rowData)}
         />
       </Tooltip>
-      
+
       <Tooltip message="Records">
         <img
           src={historyicon}
           alt="history"
           className="action-icon"
-          onClick={() => navigate(`/history/book/${rowData.id}`, { state: { rowData } })}
+          onClick={() =>
+            navigate(`/history/book/${rowData.id}`, { state: { rowData } })
+          }
         />
       </Tooltip>
 
       <Tooltip message="Delete">
-    <img
-      src={DeleteIcon}
-      alt="Delete"
-      className="action-icon"
-      onClick={() => handleOpenModal("delete", rowData)} // pass rowData for deletion
-    />
-    </Tooltip>
-
-
-      
+        <img
+          src={DeleteIcon}
+          alt="Delete"
+          className="action-icon"
+          onClick={() => handleOpenModal("delete", rowData)} // pass rowData for deletion
+        />
+      </Tooltip>
     </div>
   );
 
@@ -307,93 +310,106 @@ function BooksPage() {
           <img
             src={next}
             alt="next"
-            className={`icon ${currentPage >= totalPages - 1 ? "disabled" : ""}`}
+            className={`icon ${
+              currentPage >= totalPages - 1 ? "disabled" : ""
+            }`}
             onClick={() => {
-              if (currentPage < totalPages - 1) handlePageChange(currentPage + 1);
+              if (currentPage < totalPages - 1)
+                handlePageChange(currentPage + 1);
             }}
           />
         </div>
       </div>
 
-      <CustomModal isOpen={isModalOpen} onClose={handleCloseModal}>
-  {modalType === 'edit' || modalType === 'add' ? (
-    <Dynamicform
-      heading={modalType === 'edit' ? 'Edit Book' : 'Add Book'}
-      fields={[
-        {
-          name: 'category_id',
-          type: 'select',
-          placeholder: 'Select Category',
-          required: true,
-          options: categories.map(category => ({
-            value: category.id,
-            label: category.name,
-          })),
-          defaultValue: currentData.category_id,
-        },
-        {
-          name: 'title',
-          type: 'text',
-          placeholder: 'Book Title',
-          required: true,
-          defaultValue: currentData.title,
-        },
-        {
-          name: 'author',
-          type: 'text',
-          placeholder: 'Author Name',
-          required: true,
-          defaultValue: currentData.author,
-        },
-        {
-          name: 'quantity',
-          type: 'number',
-          placeholder: 'Quantity',
-          required: true,
-          defaultValue: currentData.quantity,
-        },
-        {
-          name: 'imageURL',
-          type: 'text',
-          placeholder: 'Image URL',
-          defaultValue: currentData.imageURL,
-        },
-      ]}
-      onCancel={handleCloseModal}
-      onSubmit={handleSubmitModal}
-      submitLabel={modalType === 'edit' ? 'Save' : 'Add'}
-    />
-  ) : modalType === 'assign' ? (
-    <IssuanceForm
-      onSubmit={handleIssuanceSubmit}
-      selectedBook={selectedBook}
-      onClose={handleCloseModal}
-    />
-  ) : modalType === 'delete' ? (
-
-    <div className="confirmation">
-      <p>Are you sure you want to delete this Book?</p>
-      <div className="confirmation-buttons">
-      <CustomButton onClick={() => handleDelete(currentData)} name="Yes"></CustomButton>
-      <CustomButton onClick={handleCloseModal} name="No"></CustomButton></div>
-      </div>
-  ) 
-  
-  : null}
-
-</CustomModal>
-
-{showToast && (
-          <Toast
-            type={toastType}
-            message={toastMessage}
-            onClose={() => setShowToast(false)}
+      <CustomModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        height={modalSizes.edit.height}
+        width={modalSizes.edit.width}
+      >
+        {modalType === "edit" || modalType === "add" ? (
+          <Dynamicform
+            heading={modalType === "edit" ? "Edit Book" : "Add Book"}
+            fields={[
+              {
+                label: "Select Category",
+                name: "category_id",
+                type: "select",
+                placeholder: "Select Category",
+                required: true,
+                options: categories.map((category) => ({
+                  value: category.id,
+                  label: category.name,
+                })),
+                defaultValue: currentData.category_id,
+              },
+              {
+                label: "Title",
+                name: "title",
+                type: "text",
+                placeholder: "Book Title",
+                required: true,
+                defaultValue: currentData.title,
+              },
+              {
+                label: "Author",
+                name: "author",
+                type: "text",
+                placeholder: "Author Name",
+                required: true,
+                defaultValue: currentData.author,
+              },
+              {
+                label: "Quantity",
+                name: "quantity",
+                type: "number",
+                placeholder: "Quantity",
+                required: true,
+                defaultValue: currentData.quantity,
+              },
+              {
+                label: "Image",
+                name: "imageURL",
+                type: "text",
+                placeholder: "Image URL",
+                defaultValue: currentData.imageURL,
+              },
+            ]}
+            defaultValues={currentData}
+            onCancel={handleCloseModal}
+            onSubmit={handleSubmitModal}
+            submitLabel={modalType === "edit" ? "Save" : "Add"}
           />
-        )}
+        ) : modalType === "assign" ? (
+          <IssuanceForm
+            onSubmit={handleIssuanceSubmit}
+            selectedBook={selectedBook}
+            onClose={handleCloseModal}
+          />
+        ) : modalType === "delete" ? (
+          <div className="confirmation">
+            <p>Are you sure you want to delete this Book?</p>
+            <div className="confirmation-buttons">
+              <CustomButton
+                onClick={() => handleDelete(currentData)}
+                name="Yes"
+              ></CustomButton>
+              <CustomButton onClick={handleCloseModal} name="No"></CustomButton>
+            </div>
+          </div>
+        ) : null}
+      </CustomModal>
 
-
+      {showToast && (
+        <Toast
+          type={toastType}
+          message={toastMessage}
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </>
   );
 }
 
-export const BookswithLayout = WithLayoutComponent(BooksPage);
+
+export default HOC(BooksPage);

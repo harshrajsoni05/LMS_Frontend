@@ -11,7 +11,7 @@ const SearchBar = ({ searchTerm, onChange, onSearch }) => {
         type="text"
         className="search-input"
         value={searchTerm}
-        onChange={onChange} // Update state on input change
+        onChange={onChange}
         placeholder="Search..."
       />
       <button className="search-button" onClick={onSearch}>

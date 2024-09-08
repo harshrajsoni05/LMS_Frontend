@@ -19,6 +19,7 @@ import back from "../assets/images/go-back.png";
 import next from "../assets/images/go-next.png";
 import EditIcon from "../assets/images/editicon.png";
 import DeleteIcon from "../assets/images/deleteicon.png";
+import CustomButton from "../components/button";
 
 const useDebouncedValue = (value, delay) => {
   const [debouncedValue, setDebouncedValue] = useState(value);
@@ -45,7 +46,7 @@ function IssuancesPage() {
   const [currentData, setCurrentData] = useState({});
 
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize] = useState(10);
+  const [pageSize] = useState(7);
   const [totalPages, setTotalPages] = useState(0);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -83,12 +84,12 @@ function IssuancesPage() {
     try {
       const issuanceToUpdate = {
         id: currentData.id,
-        user_id: updatedIssuance.user_id,
-        book_id: updatedIssuance.book_id,
-        issue_date: updatedIssuance.issue_date,
-        return_date: updatedIssuance.return_date,
-        status: updatedIssuance.status,
-        issuance_type: updatedIssuance.issuance_type,
+        user_id: currentData.user_id,
+        book_id: currentData.book_id,
+        issue_date: currentData.issue_date,
+        return_date: updatedIssuance.return_date, 
+        status: updatedIssuance.status, 
+        issuance_type: currentData.issuance_type,
       };
 
       await updateIssuance(currentData.id, issuanceToUpdate);
@@ -104,10 +105,10 @@ function IssuancesPage() {
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm("Are you sure you want to delete this Issuance?"))
       try {
         await deleteIssuance(id);
         setIssuances(issuances.filter((issuance) => issuance.id !== id));
+        handleCloseModal();
         showSuccessToast("Issuance Deleted successfully!");
 
       } catch (error) {
@@ -147,6 +148,7 @@ function IssuancesPage() {
     if (modalType === "edit") {
       handleEditIssuance(data);
     }
+    
   };
 
   const formatDate = (dateString) => {
@@ -164,41 +166,60 @@ function IssuancesPage() {
     { header: "Book", render: (rowData) => rowData?.books?.title || "N/A" },
     { header: "Status", accessor: "status" },
     {
-      header: "Issuance Type",render: (rowData) => {
-        return rowData.issuance_type === "In House" ? "Takeaway" : "In House";
-      }
-    },    {
+      header: "Issuance Type", 
+      render: (rowData) => rowData.issuance_type === "In House" ? "Takeaway" : "In House",
+    },
+    {
       header: "Issue Date",
-      render: (rowData) => formatDate(rowData.issue_date),
+      render: (rowData) => {
+        if (rowData.issuance_type === "Library") {
+          const issueTime = new Date(rowData.issue_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          return issueTime;
+        }
+        const issueDate = new Date(rowData.issue_date).toLocaleDateString(undefined, {
+          year: 'numeric', month: 'long', day: 'numeric',
+        });
+        return issueDate;
+      },
     },
     {
       header: "Return Date",
-      render: (rowData) => formatDate(rowData.return_date),
+      render: (rowData) => {
+        if (!rowData.return_date) {
+          return "Pending";
+        }
+        if (rowData.issuance_type === "In House") {
+          const returnDate = new Date(rowData.return_date).toLocaleDateString(undefined, {
+            year: 'numeric', month: 'long', day: 'numeric',
+          });
+          return returnDate;
+        } else if (rowData.issuance_type === "Library") {
+          const returnTime = new Date(rowData.return_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          return returnTime;
+        }
+        return "N/A";
+      },
     },
     {
       header: "Actions",
       render: (rowData) => renderActions(rowData),
     },
   ];
+  
+  
+  
 
   const renderActions = (rowData) => (
     <div className="actionicons">
       <Tooltip message="Edit">
-        <img
-          src={EditIcon}
-          alt="Edit"
-          style={{ paddingLeft: "0" }}
-          className="action-icon"
+        <img src={EditIcon} alt="Edit" style={{ paddingLeft: "0" }} className="action-icon"
           onClick={() => handleOpenModal("edit", rowData)}
         />
       </Tooltip>
 
       <Tooltip message="Delete">
-        <img
-          src={DeleteIcon}
-          alt="Delete"
-          className="action-icon"
-          onClick={() => handleDelete(rowData.id)}
+        <img src={DeleteIcon} alt="Delete" className="action-icon"
+          onClick={() => handleOpenModal("delete",rowData.id)}
         />
       </Tooltip>
     </div>
@@ -209,27 +230,16 @@ function IssuancesPage() {
       <div className="category-page">
         <div className="category-heading">
           <h1>Issuances</h1>
-          <SearchBar
-            searchTerm={searchTerm}
-            onChange={handleSearchChange}
-            onSearch={handleSearch}
-          />
+          <SearchBar searchTerm={searchTerm} onChange={handleSearchChange} onSearch={handleSearch}/>
         </div>
 
         <div className="table-container">
-          <Table
-            data={issuances}
-            columns={columns}
-            currentPage={currentPage}
-            pageSize={pageSize}
+          <Table data={issuances} columns={columns} currentPage={currentPage} pageSize={pageSize}
           />
         </div>
 
         <div className="pagination-controls">
-          <img
-            src={back}
-            alt="back"
-            className={`icon ${currentPage === 0 ? "disabled" : ""}`}
+          <img src={back} alt="back" className={`icon ${currentPage === 0 ? "disabled" : ""}`}
             onClick={() => {
               if (currentPage > 0) handlePageChange(currentPage - 1);
             }}
@@ -237,53 +247,20 @@ function IssuancesPage() {
           <span>
             Page {currentPage + 1} of {totalPages}
           </span>
-          <img
-            src={next}
-            alt="next"
-            className={`icon ${
-              currentPage >= totalPages - 1 ? "disabled" : ""
-            }`}
+          <img src={next} alt="next" className={`icon ${ currentPage >= totalPages - 1 ? "disabled" : ""}`}
             onClick={() => {
               if (currentPage < totalPages - 1)
                 handlePageChange(currentPage + 1);
-            }}
+              }}
           />
         </div>
       </div>
 
       <CustomModal isOpen={isModalOpen} onClose={handleCloseModal}>
-        <Dynamicform
+      {modalType === "edit" ? (<Dynamicform
           heading="Edit Issuance"
           fields={[
-            {
-              name: "user_id",
-              type: "text",
-              placeholder: "User ID",
-              required: true,
-              defaultValue: currentData.user_id,
-            },
-            {
-              name: "book_id",
-              type: "text",
-              placeholder: "Book ID",
-              required: true,
-              defaultValue: currentData.book_id,
-            },
-            {
-              name: "issue_date",
-              type: "date",
-              placeholder: "Issue Date",
-              required: true,
-              defaultValue: currentData.issue_date,
-            },
-            {
-              name: "return_date",
-              type: "date",
-              placeholder: "Return Date",
-              required: false,
-              defaultValue: currentData.return_date,
-            },
-            {
+            {  label:"Status",
               name: "status",
               type: "select",
               placeholder: "Status",
@@ -291,25 +268,33 @@ function IssuancesPage() {
               options: [
                 { value: "Returned", label: "Returned" },
                 { value: "Pending", label: "Pending" },
-                { value: "Overdue", label: "Overdue" },
               ],
               defaultValue: currentData.status,
             },
             {
-              name: "issuance_type",
-              type: "select",
-              placeholder: "Issuance Type",
-              required: true,
-              options: [
-                { value: "Library", label: "In House" },
-                { value: "In House", label: "Takeaway" },
-              ],
-              defaultValue: currentData.issuance_type,
+              name: "return_date",
+              label:"Return date",
+              type: "datetime-local",
+              placeholder: "Return Date",
+              required: false,
+              defaultValue: currentData.return_date,
             },
+            
+            
           ]}
           onSubmit={handleSubmitModal}
           onCancel={handleCloseModal}
-        />
+          defaultValues={currentData}
+
+        />): modalType === "delete" ? (
+          <div className="confirmation">
+            <p>Are you sure you want to delete this Issuance?</p>
+            <div className="confirmation-buttons">
+            <CustomButton onClick={() => handleDelete(currentData)} name="Yes"></CustomButton>
+            <CustomButton onClick={handleCloseModal} name="No"></CustomButton></div>
+          </div>
+        ) : null} {}
+        
       </CustomModal>
       {showToast && (
           <Toast
