@@ -1,112 +1,56 @@
+import {
+  fetchCategories,
+  fetchAllCategories,
+  addCategory,
+  updateCategory,
+  deleteCategory,
+} from '../api/CategoryServices'; 
+import {
+  fetchDataWithPagination,
+  fetchAllData,
+  addData,
+  updateData,
+  deleteData,
+} from '../api/ApiManager'; 
 
-import axiosInstance from '../api/AxiosInstance';
-import { fetchCategories, fetchAllCategories, addCategory, updateCategory, deleteCategory } from '../api/CategoryServices';
+import {CATEGORIES_API_URL} from "../constants/apiConstants"
 
-// Mock axiosInstance
-jest.mock('../api/AxiosInstance');
+jest.mock('../api/ApiManager'); 
 
-describe('CategoryServices', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
+describe('Category API functions', () => {
+  beforeEach(() => {
+    jest.clearAllMocks(); 
   });
 
-  describe('fetchCategories', () => {
-    it('should fetch categories with pagination and search term', async () => {
-      const mockData = { data: { categories: ['Category 1', 'Category 2'], total: 2 } };
-      axiosInstance.get.mockResolvedValueOnce(mockData);
-
-      const result = await fetchCategories(1, 5, 'test');
-
-      expect(axiosInstance.get).toHaveBeenCalledWith('/categories', {
-        params: { page: 1, size: 5, search: 'test' }
-      });
-      expect(result).toEqual(mockData.data);
-    });
-
-    it('should handle errors during fetchCategories', async () => {
-      const mockError = new Error('Failed to fetch categories');
-      axiosInstance.get.mockRejectedValueOnce(mockError);
-
-      await expect(fetchCategories()).rejects.toThrow('Failed to fetch categories');
-      expect(axiosInstance.get).toHaveBeenCalledWith('/categories', {
-        params: { page: 0, size: 7, search: '' }
-      });
-    });
+  test('fetchCategories should call fetchDataWithPagination with correct arguments', () => {
+    const page = 1;
+    const pageSize = 10;
+    const search = 'test';
+    fetchCategories(page, pageSize, search);
+    expect(fetchDataWithPagination).toHaveBeenCalledWith(CATEGORIES_API_URL, page, pageSize, search);
   });
 
-  describe('fetchAllCategories', () => {
-    it('should fetch all categories', async () => {
-      const mockData = { data: ['Category 1', 'Category 2'] };
-      axiosInstance.get.mockResolvedValueOnce(mockData);
-
-      const result = await fetchAllCategories();
-
-      expect(axiosInstance.get).toHaveBeenCalledWith('/categories/all');
-      expect(result).toEqual(mockData.data);
-    });
-
-    it('should handle errors during fetchAllCategories', async () => {
-      const mockError = new Error('Failed to fetch all categories');
-      axiosInstance.get.mockRejectedValueOnce(mockError);
-
-      await expect(fetchAllCategories()).rejects.toThrow('Failed to fetch all categories');
-    });
+  test('fetchAllCategories should call fetchAllData with correct arguments', () => {
+    fetchAllCategories();
+    expect(fetchAllData).toHaveBeenCalledWith(CATEGORIES_API_URL);
   });
 
-  describe('addCategory', () => {
-    it('should add a new category', async () => {
-      const mockData = { data: { id: 1, name: 'New Category' } };
-      const categoryData = { name: 'New Category' };
-      axiosInstance.post.mockResolvedValueOnce(mockData);
-
-      const result = await addCategory(categoryData);
-
-      expect(axiosInstance.post).toHaveBeenCalledWith('/categories', categoryData);
-      expect(result).toEqual(mockData.data);
-    });
-
-    it('should handle errors during addCategory', async () => {
-      const mockError = new Error('Failed to add category');
-      axiosInstance.post.mockRejectedValueOnce(mockError);
-
-      await expect(addCategory({ name: 'New Category' })).rejects.toThrow('Failed to add category');
-    });
+  test('addCategory should call addData with correct arguments', () => {
+    const categoryData = { name: 'New Category' };
+    addCategory(categoryData);
+    expect(addData).toHaveBeenCalledWith(CATEGORIES_API_URL, categoryData);
   });
 
-  describe('updateCategory', () => {
-    it('should update an existing category', async () => {
-      const mockData = { data: { id: 1, name: 'Updated Category' } };
-      const categoryData = { name: 'Updated Category' };
-      axiosInstance.put.mockResolvedValueOnce(mockData);
-
-      const result = await updateCategory(1, categoryData);
-
-      expect(axiosInstance.put).toHaveBeenCalledWith('/categories/1', categoryData);
-      expect(result).toEqual(mockData.data);
-    });
-
-    it('should handle errors during updateCategory', async () => {
-      const mockError = new Error('Failed to update category');
-      axiosInstance.put.mockRejectedValueOnce(mockError);
-
-      await expect(updateCategory(1, { name: 'Updated Category' })).rejects.toThrow('Failed to update category');
-    });
+  test('updateCategory should call updateData with correct arguments', () => {
+    const id = 1;
+    const categoryData = { name: 'Updated Category' };
+    updateCategory(id, categoryData);
+    expect(updateData).toHaveBeenCalledWith(CATEGORIES_API_URL, id, categoryData);
   });
 
-  describe('deleteCategory', () => {
-    it('should delete a category by id', async () => {
-      axiosInstance.delete.mockResolvedValueOnce();
-
-      await deleteCategory(1);
-
-      expect(axiosInstance.delete).toHaveBeenCalledWith('/categories/1');
-    });
-
-    it('should handle errors during deleteCategory', async () => {
-      const mockError = new Error('Failed to delete category');
-      axiosInstance.delete.mockRejectedValueOnce(mockError);
-
-      await expect(deleteCategory(1)).rejects.toThrow('Failed to delete category');
-    });
+  test('deleteCategory should call deleteData with correct arguments', () => {
+    const id = 1;
+    deleteCategory(id);
+    expect(deleteData).toHaveBeenCalledWith(CATEGORIES_API_URL, id);
   });
 });

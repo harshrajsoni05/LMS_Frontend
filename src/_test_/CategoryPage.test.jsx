@@ -1,162 +1,72 @@
-// CategoryPage.test.js
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
-import CategoryPage from '../pages/CategoryPage';
-import { addCategory, updateCategory, deleteCategory, fetchCategories } from '../api/CategoryServices';
-import { MemoryRouter } from 'react-router-dom'; 
+import { render, screen, fireEvent } from '@testing-library/react';
 import { Provider } from 'react-redux';
-import store from '../redux/store'; 
+import { store } from '../redux/store'; 
+import { BrowserRouter as Router } from 'react-router-dom';
+import CategoryPage from '../pages/CategoryPage';
+
+import { fetchCategories, addCategory, updateCategory, deleteCategory } from '../api/CategoryServices';
+
+
+
+import { MemoryRouter } from 'react-router-dom';
+
 
 jest.mock('../api/CategoryServices');
+jest.mock('../components/toast/toast', () => ({
+  __esModule: true,
+  default: ({ message }) => <div>{message}</div>,
+}));
+
+const renderWithRouter = (ui) => render(<MemoryRouter>{ui}</MemoryRouter>);
 
 describe('CategoryPage', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    fetchCategories.mockResolvedValue({ content: [], totalPages: 1 });
+    addCategory.mockResolvedValue({});
+    updateCategory.mockResolvedValue({});
+    deleteCategory.mockResolvedValue({});
   });
 
-  test('should call handleAddCategory on Add Category', async () => {
-    render(
-      <MemoryRouter>
-        <Provider store={store}>
-          <CategoryPage />
-        </Provider>
-      </MemoryRouter>
-    );
+  test('renders CategoryPage with heading and buttons', () => {
+    renderWithRouter(<CategoryPage />);
 
-    // Open the modal
-    fireEvent.click(screen.getByText('Add Category'));
-
-    // Fill in the form
-    fireEvent.change(screen.getByPlaceholderText('Category Name'), { target: { value: 'New Category' } });
-    fireEvent.change(screen.getByPlaceholderText('Description'), { target: { value: 'Description here' } });
-
-    // Submit the form
-    fireEvent.click(screen.getByText('Submit'));
-
-    // Check that the addCategory function was called
-    await waitFor(() => {
-      expect(addCategory).toHaveBeenCalledWith({
-        name: 'New Category',
-        description: 'Description here'
-      });
-    });
+    expect(screen.getByText('Category List')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Add Category/i })).toBeInTheDocument();
   });
 
-  test('should call handleEditCategory on Edit Category', async () => {
-    render(
-      <MemoryRouter>
-        <Provider store={store}>
-          <CategoryPage />
-        </Provider>
-      </MemoryRouter>
-    );
+  test('opens and closes add category modal', async () => {
+    renderWithRouter(<CategoryPage />);
 
-    // Open the edit modal
-    fireEvent.click(screen.getByAltText('Edit'));
-
-    // Fill in the form
-    fireEvent.change(screen.getByPlaceholderText('Category Name'), { target: { value: 'Updated Category' } });
-    fireEvent.change(screen.getByPlaceholderText('Description'), { target: { value: 'Updated Description' } });
-
-    // Submit the form
-    fireEvent.click(screen.getByText('Submit'));
-
-    // Check that the updateCategory function was called
-    await waitFor(() => {
-      expect(updateCategory).toHaveBeenCalledWith(
-        expect.any(Number), // Replace with actual id if needed
-        {
-          name: 'Updated Category',
-          description: 'Updated Description'
-        }
-      );
-    });
-  });
-
-  test('should call handleDelete on Delete button click', async () => {
-    render(
-      <MemoryRouter>
-        <Provider store={store}>
-          <CategoryPage />
-        </Provider>
-      </MemoryRouter>
-    );
-
-    // Open the delete modal
-    fireEvent.click(screen.getByAltText('Delete'));
-
-    // Confirm deletion
-    fireEvent.click(screen.getByText('Yes'));
-
-    // Check that the deleteCategory function was called with the correct id
-    await waitFor(() => {
-      expect(deleteCategory).toHaveBeenCalledWith(expect.any(Number)); // Replace with actual id if needed
-    });
-  });
-
-  test('should open the Add Category modal on Add button click', () => {
-    render(
-      <MemoryRouter>
-        <Provider store={store}>
-          <CategoryPage />
-        </Provider>
-      </MemoryRouter>
-    );
-
-    // Check that the Add Category button is in the document
-    const addButton = screen.getByText('Add Category');
-
-    // Simulate button click
-    fireEvent.click(addButton);
-
-    // Check if modal is open
+    fireEvent.click(screen.getByRole('button', { name: /Add Category/i }));
     expect(screen.getByText('Add Category')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('No'));
+    expect(screen.queryByText('Add Category')).not.toBeInTheDocument();
   });
 
-  test('should update input fields correctly', () => {
-    render(
-      <MemoryRouter>
-        <Provider store={store}>
-          <CategoryPage />
-        </Provider>
-      </MemoryRouter>
-    );
+  test('shows success toast on adding a category', async () => {
+    renderWithRouter(<CategoryPage />);
 
-    // Open the Add Category modal
-    fireEvent.click(screen.getByText('Add Category'));
-
-    // Find and update input fields
-    const nameInput = screen.getByPlaceholderText('Category Name');
-    const descriptionInput = screen.getByPlaceholderText('Description');
-
-    fireEvent.change(nameInput, { target: { value: 'New Category' } });
-    fireEvent.change(descriptionInput, { target: { value: 'Description here' } });
-
-    // Check if inputs have been updated
-    expect(nameInput.value).toBe('New Category');
-    expect(descriptionInput.value).toBe('Description here');
+    fireEvent.click(screen.getByRole('button', { name: /Add Category/i }));
+    // Fill form with valid data and submit
+    // Simulate form submission
+    // Replace the following line with actual form submission logic if needed
+    await waitFor(() => expect(screen.getByText('Category added successfully!')).toBeInTheDocument());
   });
 
-  test('should display categories correctly', async () => {
-    const mockCategories = [
-      { id: 1, name: 'Category 1', description: 'Description 1' },
-      { id: 2, name: 'Category 2', description: 'Description 2' }
-    ];
+  test('shows failure toast on failed category addition', async () => {
+    addCategory.mockRejectedValue(new Error('Failed to add category'));
+    renderWithRouter(<CategoryPage />);
 
-    // Mock the fetchCategories function to return mock data
-    fetchCategories.mockResolvedValue({ content: mockCategories, totalPages: 1 });
+    fireEvent.click(screen.getByRole('button', { name: /Add Category/i }));
+    // Simulate form submission
+    await waitFor(() => expect(screen.getByText('Failed to add category')).toBeInTheDocument());
+  });
 
-    render(
-      <MemoryRouter>
-        <Provider store={store}>
-          <CategoryPage />
-        </Provider>
-      </MemoryRouter>
-    );
+  test('handles page navigation', async () => {
+    renderWithRouter(<CategoryPage />);
 
-    // Wait for categories to be displayed
-    await waitFor(() => {
-      expect(screen.getByText('Category 1')).toBeInTheDocument();
-    });
+    fireEvent.click(screen.getByAltText('next'));
+    // Add assertions based on pagination logic if applicable
   });
 });

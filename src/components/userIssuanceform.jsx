@@ -2,17 +2,25 @@ import { useState } from "react";
 import { findBookSuggestions } from "../api/BookServices";
 import "../styles/Issuanceform.css";
 import CustomButton from "./button";
-import { formatTimestamp } from "./utils"; 
+import { formatDateTime } from "./utils"; 
 
 const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
   const [bookTitle, setBookTitle] = useState("");
   const [book_id, setBookId] = useState(null);
   const [issuance_type, setIssuanceType] = useState("In House");
   const [expectedReturn, setExpectedReturn] = useState(""); 
-  const [issuedAt] = useState((new Date())); 
-  const [errorMessage, setErrorMessage] = useState("");
+  const [issue_date, setIssueDate] = useState(() => {
+    const date = new Date();
+    
+    const istOffset = 5 * 60 + 30; 
+    const istTime = new Date(date.getTime() + istOffset * 60 * 1000);
+    const formattedDate = istTime.toISOString().split('.')[0];
+    
+    return formattedDate;
+  });  const [errorMessage, setErrorMessage] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [bookSuggestions, setBookSuggestions] = useState([]);
+  const [returnTime ,setReturnTime] = useState("");
 
   const fetchBookSuggestions = async (query) => {
     if (query.length < 2) {
@@ -53,29 +61,29 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
     }
 
     let returnedAt = null;
+
     if (issuance_type === "In House" && expectedReturn) {
-      returnedAt = formatTimestamp(expectedReturn); 
-    } else if (issuance_type === "Library" && expectedReturn) {
-      const currentDate = new Date().toISOString().slice(0, 10); 
-      returnedAt = formatTimestamp(`${currentDate} ${expectedReturn}`); 
+        returnedAt = formatDateTime(new Date(expectedReturn).toLocaleString()); 
+    } else if (issuance_type === "Library" && returnTime) {
+        const currentDate = new Date().toISOString().slice(0, 10); 
+        returnedAt = formatDateTime(new Date(`${currentDate}T${returnTime}`).toLocaleString());
     }
 
     const issuanceDetails = {
       user_id: selectedUser.id,
       book_id,
-      issue_date: issuedAt, 
+      issue_date, 
       return_date: returnedAt,
       status: "Issued",
       issuance_type,
     };
 
-    console.log("Issuance details submitted:", issuanceDetails);
     onSubmit(issuanceDetails);
     onClose();
   };
 
   const todayDate = new Date().toISOString().split("T")[0];
-  const now = new Date().toISOString().slice(0, 16); // Current date and time for min
+  const now = new Date().toISOString().slice(0, 16); 
 
   return (
     <div className="issuance-form">
@@ -132,8 +140,8 @@ const UserIssuanceform = ({ onSubmit, selectedUser, onClose }) => {
             <label>Expected Return Time</label>
             <input
               type="time"
-              value={expectedReturn}
-              onChange={(e) => setExpectedReturn(e.target.value)}
+              value={returnTime}
+              onChange={(e) => setReturnTime(e.target.value)}
               
               min={todayDate}
 

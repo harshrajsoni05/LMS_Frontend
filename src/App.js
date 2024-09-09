@@ -13,7 +13,7 @@ import { useEffect } from 'react';
 import { loginUser } from './redux/authActions';
 import { getCurrentUser } from './api/Auth';
 import { UserHistoryWithLayout } from './pages/User/UserHistory';
-import { HistoryWithLayout } from './pages/history';
+import { HistoryWithLayout } from './pages/History';
 
 function App() {
   const navigate = useNavigate();

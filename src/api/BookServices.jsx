@@ -1,89 +1,23 @@
-import axios from "axios";
+import {
+  fetchDataWithPagination,
+  fetchAllData,
+  addData,
+  updateData,
+  deleteData,
+} from "./ApiManager";
+import { BOOKS_API_URL } from "../constants/apiConstants";
 import axiosInstance from "./AxiosInstance";
 
-const API_BASE_URL = "/books";
-
-
-
-const fetchAllBooks = async()=>{
-  const response = await axiosInstance.get(`${API_BASE_URL}/all`);
-  return response.data;
-
-}
-
-const fetchBooks = async (page = 0, pagesize = 7, search = "") => {
-  try {
-    const trimmedSearchTerm = search.trim(); 
-    const response = await axiosInstance.get(`${API_BASE_URL}`, {
-
-      params: {
-        page: page,
-        size: pagesize,
-        search: trimmedSearchTerm, 
-      },
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching books:", error);
-    throw error;
-  }
-};
-
-
-const addBook = async (bookData) => {
-  try {
-    const response = await axiosInstance.post(API_BASE_URL, bookData);
-    return response.data;
-  } catch (error) {
-    console.error("Error adding book:", error);
-    throw error;
-  }
-};
-
-
-const updateBook = async (id, bookData) => {
-  try {
-    if (!id || !bookData) {
-      throw new Error('ID and book data are required for updating a book');
-    }
-
-    const response = await axiosInstance.put(`${API_BASE_URL}/${id}`, bookData);
-
-    return response.data;
-  } catch (error) {
-    console.error("Error updating book:", error.response ? error.response.data : error.message);
-    throw error;
-  }
-};
-
-export default updateBook;
-
-
-const deleteBook = async (id) => {
-  try {
-    await axiosInstance.delete(`${API_BASE_URL}/${id}`);
-  } catch (error) {
-    console.error("Error deleting book:", error);
-    throw error;
-  }
-};
-
-const assignBookToUser = async (bookId, userId) => {
-  try {
-    const response = await axiosInstance.post(`${API_BASE_URL}/assign`, {
-      bookId,
-      userId,
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error assigning book:", error);
-    throw error;
-  }
-};
+const fetchBooks = (page, pageSize, search) =>
+  fetchDataWithPagination(BOOKS_API_URL, page, pageSize, search);
+const fetchAllBooks = () => fetchAllData(BOOKS_API_URL);
+const addBook = (bookData) => addData(BOOKS_API_URL, bookData);
+const updateBook = (id, bookData) => updateData(BOOKS_API_URL, id, bookData);
+const deleteBook = (id) => deleteData(BOOKS_API_URL, id);
 
 const findBookSuggestions = async (query) => {
   try {
-    const response = await axiosInstance.get(`${API_BASE_URL}/suggestions`,{
+    const response = await axiosInstance.get(`${BOOKS_API_URL}/suggestions`,{
       params :{
         query:query
       }
@@ -95,7 +29,4 @@ const findBookSuggestions = async (query) => {
     throw error;
   }
 };
-
-
-
-export { findBookSuggestions ,fetchAllBooks ,fetchBooks, addBook, updateBook, deleteBook, assignBookToUser };
+export {findBookSuggestions, fetchBooks, fetchAllBooks, addBook, updateBook, deleteBook };

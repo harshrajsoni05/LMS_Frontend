@@ -10,7 +10,6 @@ import {
 } from "../api/BookServices";
 import { fetchAllCategories } from "../api/CategoryServices";
 import { addIssuance } from "../api/IssuanceServices";
-import useDebouncedValue from "./CategoryPage";
 
 //components
 import CustomButton from "../components/button";
@@ -55,7 +54,6 @@ function BooksPage(){
   const [totalPages, setTotalPages] = useState(0);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useDebouncedValue(searchTerm, 500);
 
   const [selectedBook, setSelectedBook] = useState(null);
 
@@ -79,19 +77,23 @@ function BooksPage(){
   };
   
   const getBooks = async () => {
-    try {
-      const data = await fetchBooks(
-        currentPage,
-        pageSize,
-        searchTerm.trim()
-      );
-      setBooks(data.content || []);
-      setTotalPages(data.totalPages || 0);
-    } catch (error) {
-      console.error("Error fetching books:", error);
-    }
+    const trimmedSearchTerm = searchTerm.trim(); 
   
+    if (trimmedSearchTerm.length >= 3 || trimmedSearchTerm.length === 0) {
+      try {
+        const data = await fetchBooks(currentPage, pageSize, trimmedSearchTerm);
+        setBooks(data.content || []);
+        setTotalPages(data.totalPages || 0);
+      } catch (error) {
+        console.error("Error fetching books:", error);
+      }
+    } else if (trimmedSearchTerm.length > 0 && trimmedSearchTerm.length < 3) {
+    } else {
+      setBooks([]);
+      setTotalPages(0);
+    }
   };
+  
 
   useEffect(() => {
     getBooks();
@@ -102,7 +104,7 @@ function BooksPage(){
       const data = await fetchAllCategories();
       setCategories(data || []);
     } catch (error) {
-      console.error("Error fetching categories:", error);
+      showFailureToast("Can't fetch Books!")
     }
   };
 
@@ -113,69 +115,68 @@ function BooksPage(){
   const handleAddBook = async (newBook) => {
     try {
       const bookToCreate = {
-        title: newBook.title,
-        author: newBook.author,
+        title: newBook.title.trim(),
+        author: newBook.author.trim(),
         category_id: parseInt(newBook.category_id, 10),
         quantity: parseInt(newBook.quantity, 10),
-        imageURL: newBook.imageURL || "",
+        imageURL: newBook.imageURL ? newBook.imageURL.trim() : "",
       };
       await addBook(bookToCreate);
       getBooks();
       showSuccessToast("Book added successfully!");
-
       handleCloseModal();
     } catch (error) {
-      console.error("Failed to add book:", error.message);
+      showFailureToast("Failed to add book!");
+      handleCloseModal();
+
     }
   };
-
+  
   const handleEditBook = async (updatedBook) => {
     try {
       const bookToUpdate = {
         id: currentData.id,
-        title: updatedBook.title,
-        author: updatedBook.author,
+        title: updatedBook.title.trim(),
+        author: updatedBook.author.trim(),
         category_id: parseInt(updatedBook.category_id, 10),
         quantity: parseInt(updatedBook.quantity, 10),
-        imageURL: updatedBook.imageURL,
+        imageURL: updatedBook.imageURL ? updatedBook.imageURL.trim() : "",
       };
       await updateBook(currentData.id, bookToUpdate);
       getBooks();
       handleCloseModal();
-      showSuccessToast("Book edited Successfully!");
+      showSuccessToast("Book edited successfully!");
     } catch (error) {
       console.error("Failed to update book:", error);
+      showFailureToast("Failed to update book!");
+
     }
   };
-
+  
   const handleDelete = async (rowData) => {
     const id = rowData.id;
     try {
       await deleteBook(id);
       setBooks(books.filter((book) => book.id !== id));
-      showSuccessToast("Book deleted Successfully!");
+      showSuccessToast("Book deleted successfully!");
       handleCloseModal();
     } catch (error) {
       console.error("Failed to delete the book", error);
-      showFailureToast("Cannot delete Book has been Issued!");
+      showFailureToast("Cannot delete. Book has been issued!");
+      handleCloseModal();
+
     }
   };
+  
 
   const handleIssuanceSubmit = async (issuanceDetails) => {
     try {
       console.log(issuanceDetails);
       const response = await addIssuance(issuanceDetails);
-      console.log(response);
-      if (response === "Issuance already exists for this user and book.") {
-        alert(response);
-      } else if (response === "No copies available for the selected book.") {
-        alert(response);
-      }
 
       getBooks();
       showSuccessToast("Issued book Successfully!");
     } catch (error) {
-      console.error("Failed to create issuance:", error);
       showFailureToast("Failed Issuance!");
     }
   };
@@ -224,7 +225,7 @@ function BooksPage(){
     }
   };
 
-  const columns = [
+   const [columns] = useState([
     { header: "Title", accessor: "title" },
     { header: "Author", accessor: "author" },
     { header: "Category", render: (rowData) => rowData.category.name },
@@ -233,7 +234,7 @@ function BooksPage(){
       header: "Actions",
       render: (rowData) => renderActions(rowData),
     },
-  ];
+  ]);
 
   const renderActions = (rowData) => (
     <div className="actionicons">
@@ -292,8 +293,13 @@ function BooksPage(){
         </div>
 
         <div className="table-container">
-          <Table data={books} columns={columns} />
+          {books.length === 0 ? (
+            <p>No data found</p>
+          ) : (
+            <Table data={books} columns={columns} />
+          )}
         </div>
+
 
         <div className="pagination-controls">
           <img

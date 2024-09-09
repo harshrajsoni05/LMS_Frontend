@@ -1,11 +1,8 @@
-// Dynamicform.test.js
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom/extend-expect';
 import Dynamicform from '../components/dynamicform';
-import CustomButton from '../components/button';
 
-// Mocking CustomButton component to avoid dealing with its implementation details
 jest.mock('../components/button', () => ({ name, onClick, className }) => (
   <button onClick={onClick} className={className}>{name}</button>
 ));

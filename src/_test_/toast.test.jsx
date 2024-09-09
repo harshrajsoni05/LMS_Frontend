@@ -1,10 +1,12 @@
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom/extend-expect';
+import { render, screen, cleanup } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import Toast from '../components/toast/toast';
 
 describe('Toast', () => {
   jest.useFakeTimers(); 
+
+  afterEach(cleanup);
 
   test('renders with success type', () => {
     render(<Toast type="success" message="Success message" onClose={() => {}} />);
@@ -21,7 +23,6 @@ describe('Toast', () => {
   test('calls onClose after duration', () => {
     const mockOnClose = jest.fn();
     render(<Toast type="success" message="Success message" duration={2000} onClose={mockOnClose} />);
-    
     
     jest.advanceTimersByTime(2000);
 

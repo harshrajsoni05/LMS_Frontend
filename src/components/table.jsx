@@ -57,7 +57,7 @@ const Table = ({ data, columns, currentPage, pageSize }) => {
                   if (column.accessor === "status") toggleFilter("status");
                   if (column.accessor === "issuance_type") toggleFilter("issuance_type");
                 }}
-                style={{ cursor: "pointer" }} // Show pointer cursor to indicate clickable columns
+                style={{ cursor: "pointer" }} 
               >
                 {column.header}
                 {column.accessor === "status" && renderIcon("status")}

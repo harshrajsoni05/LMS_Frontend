@@ -21,22 +21,6 @@ import EditIcon from "../assets/images/editicon.png";
 import DeleteIcon from "../assets/images/deleteicon.png";
 import CustomButton from "../components/button";
 
-const useDebouncedValue = (value, delay) => {
-  const [debouncedValue, setDebouncedValue] = useState(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      setDebouncedValue(value);
-    }, delay);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, delay]);
-
-  return debouncedValue;
-};
-
 function IssuancesPage() {
   const [issuances, setIssuances] = useState([]);
 
@@ -50,35 +34,47 @@ function IssuancesPage() {
   const [totalPages, setTotalPages] = useState(0);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useDebouncedValue(searchTerm, 500);
 
   const [showToast, setShowToast] = useState(false);
-  const [toastType, setToastType] = useState('success');
-  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState("success");
+  const [toastMessage, setToastMessage] = useState("");
   const showSuccessToast = (message) => {
-    setToastType('success');
+    setToastType("success");
     setToastMessage(message);
     setShowToast(true);
   };
   const showFailureToast = (message) => {
-    setToastType('failure');
+    setToastType("failure");
     setToastMessage(message);
     setShowToast(true);
   };
 
   const getIssuances = async () => {
-    try {
-      const data = await fetchIssuances(currentPage, pageSize, debouncedSearchTerm.trim());
-      setIssuances(data.content || []);
-      setTotalPages(data.totalPages || 0);
-    } catch (error) {
-      console.error("Error fetching issuances:", error);
+    const trimmedSearchTerm = searchTerm.trim();
+
+    if (trimmedSearchTerm.length >= 3 || trimmedSearchTerm.length === 0) {
+      try {
+        const data = await fetchIssuances(
+          currentPage,
+          pageSize,
+          trimmedSearchTerm
+        );
+        setIssuances(data.content || []);
+        setTotalPages(data.totalPages || 0);
+      } catch (error) {
+        console.error("Error fetching issuances:", error);
+      }
+    } else if (trimmedSearchTerm.length > 0 && trimmedSearchTerm.length < 3) {
+      console.warn("Search term must be at least 3 characters.");
+    } else {
+      setIssuances([]);
+      setTotalPages(0);
     }
   };
 
   useEffect(() => {
     getIssuances();
-  }, [currentPage, debouncedSearchTerm]);
+  }, [currentPage, searchTerm]);
 
   const handleEditIssuance = async (updatedIssuance) => {
     try {
@@ -87,8 +83,8 @@ function IssuancesPage() {
         user_id: currentData.user_id,
         book_id: currentData.book_id,
         issue_date: currentData.issue_date,
-        return_date: updatedIssuance.return_date, 
-        status: updatedIssuance.status, 
+        return_date: updatedIssuance.return_date,
+        status: updatedIssuance.status,
         issuance_type: currentData.issuance_type,
       };
 
@@ -96,26 +92,22 @@ function IssuancesPage() {
       getIssuances();
       handleCloseModal();
       showSuccessToast("Issuance Edited successfully!");
-
     } catch (error) {
       console.error("Failed to update issuance:", error);
       showFailureToast("Failed to update Issuance");
-
     }
   };
 
   const handleDelete = async (id) => {
-      try {
-        await deleteIssuance(id);
-        setIssuances(issuances.filter((issuance) => issuance.id !== id));
-        handleCloseModal();
-        showSuccessToast("Issuance Deleted successfully!");
-
-      } catch (error) {
-        console.error("Failed to delete the issuance:", error);
-        showFailureToast("Failed to Delete Issuance");
-
-      }
+    try {
+      await deleteIssuance(id);
+      setIssuances(issuances.filter((issuance) => issuance.id !== id));
+      handleCloseModal();
+      showSuccessToast("Issuance Deleted successfully!");
+    } catch (error) {
+      console.error("Failed to delete the issuance:", error);
+      showFailureToast("Failed to Delete Issuance");
+    }
   };
 
   const handleSearchChange = (e) => {
@@ -148,39 +140,27 @@ function IssuancesPage() {
     if (modalType === "edit") {
       handleEditIssuance(data);
     }
-    
-  };
-
-  const formatDate = (dateString) => {
-    if (!dateString) {
-      return "Pending Return";
-    }
-    const date = new Date(dateString);
-    const options = { year: "numeric", month: "long", day: "numeric" };
-    return date.toLocaleDateString(undefined, options);
   };
 
   const columns = [
     { header: "S No.", accessor: "serialNo" },
     { header: "User", render: (rowData) => rowData?.users?.name || "N/A" },
     { header: "Book", render: (rowData) => rowData?.books?.title || "N/A" },
-    { header: "Status", accessor: "status" },
-    {
-      header: "Issuance Type", 
-      render: (rowData) => rowData.issuance_type === "In House" ? "Takeaway" : "In House",
-    },
+
     {
       header: "Issue Date",
       render: (rowData) => {
-        if (rowData.issuance_type === "Library") {
-          const issueTime = new Date(rowData.issue_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          return issueTime;
-        }
-        const issueDate = new Date(rowData.issue_date).toLocaleDateString(undefined, {
-          year: 'numeric', month: 'long', day: 'numeric',
-        });
-        return issueDate;
+        return (
+          rowData.issue_date.split("T")[0] +
+          " " +
+          rowData.issue_date.split("T")[1].split(".")[0]
+        );
       },
+    },
+    {
+      header: "Issuance Type",
+      render: (rowData) =>
+        rowData.issuance_type === "In House" ? "Takeaway" : "In House",
     },
     {
       header: "Return Date",
@@ -189,37 +169,43 @@ function IssuancesPage() {
           return "Pending";
         }
         if (rowData.issuance_type === "In House") {
-          const returnDate = new Date(rowData.return_date).toLocaleDateString(undefined, {
-            year: 'numeric', month: 'long', day: 'numeric',
-          });
-          return returnDate;
+          return (
+            rowData.return_date.split("T")[0] +
+            " " +
+            rowData.return_date.split("T")[1].split(".")[0]
+          );
         } else if (rowData.issuance_type === "Library") {
-          const returnTime = new Date(rowData.return_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          return returnTime;
+          return rowData.return_date.split("T")[1].split(".")[0];
         }
         return "N/A";
       },
     },
+    { header: "Status", accessor: "status" },
+
     {
       header: "Actions",
       render: (rowData) => renderActions(rowData),
     },
   ];
-  
-  
-  
 
   const renderActions = (rowData) => (
     <div className="actionicons">
       <Tooltip message="Edit">
-        <img src={EditIcon} alt="Edit" style={{ paddingLeft: "0" }} className="action-icon"
+        <img
+          src={EditIcon}
+          alt="Edit"
+          style={{ paddingLeft: "0" }}
+          className="action-icon"
           onClick={() => handleOpenModal("edit", rowData)}
         />
       </Tooltip>
 
       <Tooltip message="Delete">
-        <img src={DeleteIcon} alt="Delete" className="action-icon"
-          onClick={() => handleOpenModal("delete",rowData.id)}
+        <img
+          src={DeleteIcon}
+          alt="Delete"
+          className="action-icon"
+          onClick={() => handleOpenModal("delete", rowData.id)}
         />
       </Tooltip>
     </div>
@@ -230,16 +216,31 @@ function IssuancesPage() {
       <div className="category-page">
         <div className="category-heading">
           <h1>Issuances</h1>
-          <SearchBar searchTerm={searchTerm} onChange={handleSearchChange} onSearch={handleSearch}/>
-        </div>
-
-        <div className="table-container">
-          <Table data={issuances} columns={columns} currentPage={currentPage} pageSize={pageSize}
+          <SearchBar
+            searchTerm={searchTerm}
+            onChange={handleSearchChange}
+            onSearch={handleSearch}
           />
         </div>
 
+        <div className="table-container">
+          {issuances.length === 0 ? (
+            <p>No Issuances found</p>
+          ) : (
+            <Table
+              data={issuances}
+              columns={columns}
+              currentPage={currentPage}
+              pageSize={pageSize}
+            />
+          )}
+        </div>
+
         <div className="pagination-controls">
-          <img src={back} alt="back" className={`icon ${currentPage === 0 ? "disabled" : ""}`}
+          <img
+            src={back}
+            alt="back"
+            className={`icon ${currentPage === 0 ? "disabled" : ""}`}
             onClick={() => {
               if (currentPage > 0) handlePageChange(currentPage - 1);
             }}
@@ -247,67 +248,73 @@ function IssuancesPage() {
           <span>
             Page {currentPage + 1} of {totalPages}
           </span>
-          <img src={next} alt="next" className={`icon ${ currentPage >= totalPages - 1 ? "disabled" : ""}`}
+          <img
+            src={next}
+            alt="next"
+            className={`icon ${
+              currentPage >= totalPages - 1 ? "disabled" : ""
+            }`}
             onClick={() => {
               if (currentPage < totalPages - 1)
                 handlePageChange(currentPage + 1);
-              }}
+            }}
           />
         </div>
       </div>
 
       <CustomModal isOpen={isModalOpen} onClose={handleCloseModal}>
-      {modalType === "edit" ? (<Dynamicform
-          heading="Edit Issuance"
-          fields={[
-            {  label:"Status",
-              name: "status",
-              type: "select",
-              placeholder: "Status",
-              required: true,
-              options: [
-                { value: "Returned", label: "Returned" },
-                { value: "Pending", label: "Pending" },
-              ],
-              defaultValue: currentData.status,
-            },
-            {
-              name: "return_date",
-              label:"Return date",
-              type: "datetime-local",
-              placeholder: "Return Date",
-              required: false,
-              defaultValue: currentData.return_date,
-            },
-            
-            
-          ]}
-          onSubmit={handleSubmitModal}
-          onCancel={handleCloseModal}
-          defaultValues={currentData}
-
-        />): modalType === "delete" ? (
+        {modalType === "edit" ? (
+          <Dynamicform
+            heading="Edit Issuance"
+            fields={[
+              {
+                label: "Status",
+                name: "status",
+                type: "select",
+                placeholder: "Status",
+                required: true,
+                options: [
+                  { value: "Returned", label: "Returned" },
+                  { value: "Pending", label: "Pending" },
+                ],
+                defaultValue: currentData.status,
+              },
+              {
+                name: "return_date",
+                label: "Return date",
+                type: "datetime-local",
+                placeholder: "Return Date",
+                required: false,
+                defaultValue: currentData.return_date,
+              },
+            ]}
+            onSubmit={handleSubmitModal}
+            onCancel={handleCloseModal}
+            defaultValues={currentData}
+          />
+        ) : modalType === "delete" ? (
           <div className="confirmation">
             <p>Are you sure you want to delete this Issuance?</p>
             <div className="confirmation-buttons">
-            <CustomButton onClick={() => handleDelete(currentData)} name="Yes"></CustomButton>
-            <CustomButton onClick={handleCloseModal} name="No"></CustomButton></div>
+              <CustomButton
+                onClick={() => handleDelete(currentData)}
+                name="Yes"
+              ></CustomButton>
+              <CustomButton onClick={handleCloseModal} name="No"></CustomButton>
+            </div>
           </div>
-        ) : null} {}
-        
+        ) : null}{" "}
+        {}
       </CustomModal>
       {showToast && (
-          <Toast
-            type={toastType}
-            message={toastMessage}
-            onClose={() => setShowToast(false)}
-          />
-        )}
-      
-      
+        <Toast
+          type={toastType}
+          message={toastMessage}
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </>
   );
 }
-
 
 export const IssuancewithLayout = WithLayoutComponent(IssuancesPage);

@@ -35,16 +35,24 @@ const Sidebar = () => {
                   Dashboard
                 </NavLink>
               </li>
+
+              <li className="menu-item">
+                <NavLink to="/category" className={({ isActive }) => (isActive ? "active" : "")}>
+                  <img src={category} alt="Category" />
+                  Category
+                </NavLink>
+              </li>
               <li className="menu-item">
                 <NavLink to="/books" className={({ isActive }) => (isActive ? "active" : "")}>
                   <img src={book} alt="Books" />
                   Books
                 </NavLink>
               </li>
+              
               <li className="menu-item">
-                <NavLink to="/category" className={({ isActive }) => (isActive ? "active" : "")}>
-                  <img src={category} alt="Category" />
-                  Category
+                <NavLink to="/user" className={({ isActive }) => (isActive ? "active" : "")}>
+                  <img src={useradd} alt="Users" />
+                  Users
                 </NavLink>
               </li>
               <li className="menu-item">
@@ -53,17 +61,9 @@ const Sidebar = () => {
                   Issuance
                 </NavLink>
               </li>
-              <li className="menu-item">
-                <NavLink to="/user" className={({ isActive }) => (isActive ? "active" : "")}>
-                  <img src={useradd} alt="Users" />
-                  Users
-                </NavLink>
-              </li>
             </>
           )}
-          
-          {/* Items for user role */}
-          {role === "ROLE_USER" && (
+                    {role === "ROLE_USER" && (
             <>
               <li className="menu-item">
                 <NavLink to="/userhistory" className={({ isActive }) => (isActive ? "active" : "")}>

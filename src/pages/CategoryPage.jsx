@@ -12,6 +12,7 @@ import EditIcon from "../assets/images/editicon.png";
 import DeleteIcon from "../assets/images/deleteicon.png";
 import Tooltip from "../components/toolTip";
 import Toast from "../components/toast/toast";
+import { modalSizes } from "../components/utils";
 
 
 const CategoryPage = ()=> {
@@ -42,14 +43,23 @@ const CategoryPage = ()=> {
   };
 
   const getCategories = async () => {
-    try {
-      const data = await fetchCategories(currentPage, pageSize, searchTerm.trim());
-      setCategories(data.content || []);
-      setTotalPages(data.totalPages || 0);
-    } catch (error) {
-      showFailureToast("Can't Fetch Categories");
+    const trimmedSearchTerm = searchTerm.trim();
+  
+    if (trimmedSearchTerm.length >= 3 || trimmedSearchTerm.length === 0) {
+      try {
+        const data = await fetchCategories(currentPage, pageSize, trimmedSearchTerm);
+        setCategories(data.content || []);
+        setTotalPages(data.totalPages || 0);
+      } catch (error) {
+        showFailureToast("Can't Fetch Categories");
+      }
+    } else if (trimmedSearchTerm.length < 3 && trimmedSearchTerm.length > 0) {
+    } else {
+      setCategories([]);
+      setTotalPages(0);
     }
   };
+  
 
   useEffect(() => {
     getCategories();
@@ -58,7 +68,7 @@ const CategoryPage = ()=> {
   const handleAddCategory = async (newCategory) => {
     try {
       const categoryToCreate = {
-        name: newCategory.name,
+        name: newCategory.name.trim(),
         description: newCategory.description,
       };
   
@@ -69,8 +79,9 @@ const CategoryPage = ()=> {
       showSuccessToast("Category added successfully!");
 
     } catch (error) {
+      handleCloseModal();
 
-      showFailureToast("Failed to add category")
+      showFailureToast("Failed to add category",error)
       
     }
   };
@@ -79,7 +90,7 @@ const CategoryPage = ()=> {
     try {
       const categoryToUpdate = {
         id: currentData.id,
-        name: updatedCategory.name,
+        name: updatedCategory.name.trim(),
         description: updatedCategory.description,
       };
 
@@ -99,9 +110,11 @@ const CategoryPage = ()=> {
       await deleteCategory(id);
       setCategories(categories.filter((category) => category.id !== id));
       showSuccessToast("Category Deleted Succesfully!");
+      handleCloseModal();
 
     } catch (error) {
       showFailureToast("Cannot Delete Category as it has Issued Books!")
+      handleCloseModal()
     }
   };
 
@@ -184,8 +197,10 @@ const CategoryPage = ()=> {
         </div>
 
         <div className="table-container">
-          <Table data={categories} columns={columns} currentPage={currentPage} pageSize={pageSize}  />
-        </div>
+          {categories.length === 0 ? (<p>No Category found</p>):
+          (<Table data={categories} columns={columns} currentPage={currentPage} pageSize={pageSize}  />
+          )}
+          </div>
 
         <div className="pagination-controls">
           <img
@@ -210,7 +225,9 @@ const CategoryPage = ()=> {
         </div>
       </div>
 
-      <CustomModal isOpen={isModalOpen} onClose={handleCloseModal} >
+      <CustomModal isOpen={isModalOpen} onClose={handleCloseModal} 
+        height={modalSizes.edit.height}
+        width={modalSizes.edit.width}>
   {modalType === "edit" || modalType === "add" ? (
     <Dynamicform
       heading={modalType === "edit" ? "Edit Category" : "Add Category"}

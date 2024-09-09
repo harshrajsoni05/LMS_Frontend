@@ -3,32 +3,29 @@ import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
-//CSS
+
 import '../styles/LoginForm.css'
 
-//Components
 import Toast from './toast/toast';
 
-//Functions
-import { login } from '../api/Auth'
-import { loginUser } from '../redux/authActions'
-import { validateEmailOrMobile, validatePassword } from '../components/utils'
+import { login } from '../api/Auth';
+import { loginUser } from '../redux/authActions';
+import { validateEmailOrMobile, validatePassword } from '../components/utils';
 
 const initialErrors = {
   username: '',
   password: ''
-}
+};
 
 const LoginForm = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const auth = useSelector(state => state.auth);
+  const auth = useSelector((state) => state.auth);
 
-  const [role, setRoleState] = useState('user'); 
   const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('')
-  const [placeholderText, setPlaceholderText] = useState("Enter Phone Number");
+  const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('success');
   const [toastMessage, setToastMessage] = useState('');
@@ -54,7 +51,7 @@ const LoginForm = () => {
         navigate('/userhistory');
       }
     }
-  }, [auth]);
+  }, [auth, navigate]);
 
   const validateLogin = () => {
     let isValid = true;
@@ -87,7 +84,7 @@ const LoginForm = () => {
     } else {
       newErrors[field] = '';
     }
-
+    
     setErrors(newErrors);
   };
 
@@ -110,43 +107,11 @@ const LoginForm = () => {
     }
   };
 
-  useEffect(() => {
-    setPlaceholderText(role === 'admin' ? 'Enter Email' : 'Enter Phone Number');
-  }, [role]);
-
-  const handleRoleChange = (event) => {
-    setRoleState(event.target.value);
-    setUsername('');
-    setPassword('');
-  };
-
   return (
     <div className="login-form">
-      <h2>Welcome to ShelfHive </h2>
+      <h2>Welcome to ShelfHive</h2>
+      <p>Enter your Credentials</p>
       <form onSubmit={handleSubmit}>
-        <div className="role-selection">
-          <input
-            type="radio"
-            id="user"
-            name="role"
-            value="user"
-            checked={role === 'user'}
-            onChange={handleRoleChange}
-          />
-          <input
-            type="radio"
-            id="admin"
-            name="role"
-            value="admin"
-            checked={role === 'admin'}
-            onChange={handleRoleChange}
-          />
-          <div className="switch">
-            <label htmlFor="user" className="switch-label">User</label>
-            <div className="slider"></div>
-            <label htmlFor="admin" className="switch-label">Admin</label>
-          </div>
-        </div>
 
         <div className="input-group">
           <label htmlFor="username" className="visually-hidden"></label>
@@ -156,7 +121,7 @@ const LoginForm = () => {
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             onBlur={() => handleBlur('username')}
-            placeholder={placeholderText}
+            placeholder="Email or Phone Number"
             className={errors.username ? 'error' : ''}
           />
           {errors.username && <p className="error-text">{errors.username}</p>}

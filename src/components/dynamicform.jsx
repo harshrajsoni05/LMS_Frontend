@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import "../styles/Dynamicform.css";
 import CustomButton from '../components/button';
+import { validateEmail } from './utils';
 
 const Dynamicform = ({ fields, onSubmit, heading, defaultValues }) => {
   const [formData, setFormData] = useState({});
@@ -13,11 +14,13 @@ const Dynamicform = ({ fields, onSubmit, heading, defaultValues }) => {
   const handleInputChange = (e) => {
     const { name, value, type } = e.target;
 
-    if (type === 'number' && value < 0) {
-      setErrors({ ...errors, [name]: "Cannot be negative" });
-      return;
+    
+    if (type === 'number') {
+      if (value.includes('.') || value < 0) {
+        setErrors({ ...errors, [name]: "Only positive integers are allowed" });
+        return;
+      }
     }
-
     setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: '' });
   };
@@ -31,11 +34,15 @@ const Dynamicform = ({ fields, onSubmit, heading, defaultValues }) => {
       const value = formData[field.name];
 
       if (!value && field.required && field.name !== 'password' && field.name !== 'confirmPassword') {
-        newErrors[field.name] = `${field.placeholder} cannot be empty`;
+        newErrors[field.name] = `${field.label} cannot be empty`;
       }
 
       if ((field.type === 'time' || field.type === 'datetime-local') && !value) {
         newErrors[field.name] = `${field.placeholder} cannot be empty`;
+      }
+
+      if (field.name === 'email' && value && !validateEmail(value)) {
+        newErrors[field.name] = `Enter a valid Email Address`;
       }
     });
 

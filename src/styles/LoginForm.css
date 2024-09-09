@@ -1,7 +1,5 @@
 .login-form {
-  width: 80%;
   text-align: center;
-  
   font-size:1rem;
   margin: 0 auto; 
 }
@@ -11,24 +9,16 @@
   font-weight: 400;
 }
 
-div.role-selection {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  color: #fff;
-  text-transform: uppercase;
-  margin-bottom: 20px; 
-}
+
 
 .login-form h2 {
-  font-size: 1.25rem;
+  font-size: 1.4rem;
   margin-bottom: 20px;
   color: #6583b7;
 }
 
 .input-group {
-  width: 90%;
-  text-align: left;
+  text-align: center;
 }
 
 .input-group label {
@@ -38,19 +28,19 @@ div.role-selection {
 }
 
 .input-group input {
-  width: 100%;
+  width: 80%;
   padding: 10px;
-  margin: 0 auto;
+  margin: 0.35rem auto;
   background-color: #effafc;
   border: 1px solid #ccc;
   border-radius: 30px;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: #333; 
 }
 
 .login-btn {
   font-weight: bold;
-  font-size: 0.9rem;
+  font-size: 1rem;
   text-align: center;
   text-transform: uppercase;
   padding: 10px 30px;
@@ -77,52 +67,7 @@ div.role-selection {
   display: none;
 }
 
-.switch {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 12rem; 
-  height: 1.75rem; 
-  border-radius: 30px;
-  padding: 5px;
-  position: relative;
-  background-color: #a1bedc;
-  margin: 0 auto; 
-  overflow: hidden; 
-}
 
-.switch-label {
-  flex: 1;
-  font-size: 0.9rem;
-  text-align: center;
-  cursor: pointer;
-  z-index: 1;
-  font-weight: bold;
-  color: #fff; 
-}
-
-
-.slider {
-  position: absolute;
-  border-radius: 30px;
-  width: 50%; 
-  height: 100%;
-  background-color: #6583b7;
-  transition: transform 0.3s ease;
-  z-index: 0;
-}
-
-input#user:checked ~ .switch .slider {
-  transform: translateX(0);
-}
-
-input#admin:checked ~ .switch .slider {
-  transform: translateX(93%); 
-}
-
-input[type="radio"] {
-  display: none;
-}
 
 .input-group .error {
   border-color: red;

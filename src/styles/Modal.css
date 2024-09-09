@@ -19,6 +19,8 @@
   flex-direction: column;
   background-color: #e0f3ff; 
   padding: 2rem;
+  padding-top:1rem;
+  padding-bottom:0.5rem;
   border-radius: 0.625rem;
   position: relative;
   box-shadow: 0 0.3125rem 0.9375rem rgba(0, 0, 0, 0.2); 

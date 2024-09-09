@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { fetchIssuancesbyBookId, fetchIssuancesbyUserId } from '../api/IssuanceServices';
 import Table from '../components/table';
@@ -6,10 +6,11 @@ import WithLayoutComponent from '../hocs/WithLayoutComponent';
 import '../styles/CategoryPage.css';
 import back from '../assets/images/go-back.png';
 import next from '../assets/images/go-next.png';
-
+import backbutton from '../assets/images/back (1).png';
 const History = () => {
   const { bookId, userId } = useParams(); 
 
+  const navigate = useNavigate(); 
 
   const [issuances, setIssuances] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
@@ -41,14 +42,7 @@ const History = () => {
     }
   };
 
-  const formatDate = (dateString) => {
-    if (!dateString) {
-      return 'Pending Return';
-    }
-    const date = new Date(dateString);
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return date.toLocaleDateString(undefined, options);
-  };
+
 
  
     const columns = [
@@ -98,6 +92,13 @@ const History = () => {
       <div className="category-heading">
         {userId > 0 ? (<h1>User Lending History</h1>) : (<h1>Book Lending History</h1>)}
       </div>
+      <img
+        src={backbutton}
+        alt="back"
+        className="back-button"
+        onClick={() => navigate(-1)}
+      />
+
 
       <div className="table-container">
         {issuances.length > 0 ? (

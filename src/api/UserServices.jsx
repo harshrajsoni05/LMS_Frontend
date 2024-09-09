@@ -1,72 +1,47 @@
+import {
+  fetchDataWithPagination,
+  addData,
+  updateData,
+  deleteData,
+} from "./ApiManager";
 import axiosInstance from "./AxiosInstance";
+import { USERS_API_URL } from "../constants/apiConstants";
 
-const API_BASE_URL = "/users";
 
-const fetchUsers = async (page = 0, pagesize = 7, search = "") => {
-  try {
-    const trimmedSearchTerm = search.trim(); 
-    const response = await axiosInstance.get(`${API_BASE_URL}`, {
-
-      params: {
-        page: page,
-        size: pagesize,
-        search: trimmedSearchTerm, 
-        role: "ROLE_USER"
-      },
-      
-    });
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching Users:", error);
-    throw error;
-  }
+const fetchUsers = async (page = 0, pageSize = 7, search = "") => {
+  return await fetchDataWithPagination(USERS_API_URL, page, pageSize, search);
 };
 
-
-const RegisterUser = async (UserData) => {
-  try {
-    const response = await axiosInstance.post(API_BASE_URL, UserData);
-    return response.data;
-  } catch (error) {
-    console.error("Error adding Issuance:", error);
-    throw error;
-  }
+const RegisterUser = async (userData) => {
+  return await addData(USERS_API_URL, userData);
 };
 
-const updateUser = async (id, UserData) => {
-  try {
-    const response = await axiosInstance.patch(`${API_BASE_URL}/${id}`, UserData);
-    return response.data;
-  } catch (error) {
-    console.error("Error updating UserData:", error);
-    throw error;
-  }
+const updateUser = async (id, userData) => {
+  return await updateData(USERS_API_URL, id, userData);
 };
 
 const deleteUser = async (id) => {
-  try {
-    await axiosInstance.delete(`${API_BASE_URL}/${id}`);
-  } catch (error) {
-    console.error("Error deleting User:", error);
-    throw error;
-  }
+  return await deleteData(USERS_API_URL, id);
 };
 
 const SearchByNumber = async (number) => {
   try {
-    const response = await axiosInstance.get(`${API_BASE_URL}/search`, {
-
-      params: {
-        phoneNumber: number,
-        
-      },
-      
+    const response = await axiosInstance.get(`${USERS_API_URL}/search`, {
+      params: { phoneNumber: number },
     });
     return response.data;
   } catch (error) {
-    console.error("Error fetching Users:", error);
+    console.error("Error searching by phone number:", error);
     throw error;
   }
 };
 
-export { SearchByNumber,fetchUsers, RegisterUser, updateUser, deleteUser };
+
+export {
+  fetchUsers,
+  RegisterUser,
+  updateUser,
+  deleteUser,
+  SearchByNumber,
+  
+};

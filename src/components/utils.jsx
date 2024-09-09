@@ -9,7 +9,7 @@ export const validatePassword = (password) => {
 };
 
 export const validateEmail = (email) => {
-    const emailPattern =  /^ [^\s@] + @[^\s@] + \.(com|org|net|co|edu|gov|info)$/i;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.(com|org|net|co|edu|gov|info)$/i;
     return emailPattern.test(email);
 }
 
@@ -22,21 +22,16 @@ export const validateNotEmpty = (text) => {
     return text.length >= 1;
 }
 
-export const formatTimestamp = (timestamp) => {
-    const date = new Date(timestamp);
-
-    const offset = 5.5 * 60; 
-    const localTime = new Date(date.getTime() + (offset - date.getTimezoneOffset()) * 60000);
-
-    const year = localTime.getFullYear();
-    const month = String(localTime.getMonth() + 1).padStart(2, '0');
-    const day = String(localTime.getDate()).padStart(2, '0');
-    const hours = String(localTime.getHours()).padStart(2, '0');
-    const minutes = String(localTime.getMinutes()).padStart(2, '0');
-    const seconds = String(localTime.getSeconds()).padStart(2, '0');
-
+export const formatDateTime = (date) => {
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    const hours = String(d.getHours()).padStart(2, '0');
+    const minutes = String(d.getMinutes()).padStart(2, '0');
+    const seconds = String(d.getSeconds()).padStart(2, '0');
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-};
+  };
 
   
 

@@ -82,6 +82,14 @@ h1 {
 .action-icon:hover {
   transform: scale(1.25);
 }
+.back-button {
+  height: 2rem; 
+  cursor: pointer; 
+  transition: transform 0.3s ease;
+}
+.back-button:hover {
+  transform: scale(1.1);
+}
 
 @media (max-width: 768px) {
 
