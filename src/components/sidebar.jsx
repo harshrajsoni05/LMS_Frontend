@@ -63,7 +63,7 @@ const Sidebar = () => {
               </li>
             </>
           )}
-                    {role === "ROLE_USER" && (
+            {role === "ROLE_USER" && (
             <>
               <li className="menu-item">
                 <NavLink to="/userhistory" className={({ isActive }) => (isActive ? "active" : "")}>

@@ -89,17 +89,18 @@ const History = () => {
 
   return (
     <div className="category-page">
+      
       <div className="category-heading">
+     
         {userId > 0 ? (<h1>User Lending History</h1>) : (<h1>Book Lending History</h1>)}
-      </div>
-      <img
+        <img
         src={backbutton}
         alt="back"
         className="back-button"
         onClick={() => navigate(-1)}
       />
-
-
+    </div>
+    
       <div className="table-container">
         {issuances.length > 0 ? (
           <Table data={issuances} columns={columns} currentPage={currentPage} pageSize={pageSize} />

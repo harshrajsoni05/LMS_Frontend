@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-
 import {
   fetchUsers,
   updateUser,
@@ -16,7 +15,9 @@ import Dynamicform from "../components/dynamicform";
 import CustomButton from "../components/button";
 import Tooltip from "../components/toolTip";
 import WithLayoutComponent from "../hocs/WithLayoutComponent";
-import Toast from "../components/toast/toast";
+import Toast from "../components/toast";
+import IssuanceForm from "../components/issuanceform";
+import Loader from "../components/loader";
 
 import back from "../assets/images/go-back.png";
 import next from "../assets/images/go-next.png";
@@ -24,13 +25,14 @@ import EditIcon from "../assets/images/editicon.png";
 import DeleteIcon from "../assets/images/deleteicon.png";
 import assign from "../assets/images/bookaddd.png";
 import historyicon from "../assets/images/historyicon.png";
+
 import { useNavigate } from "react-router-dom";
-import UserIssuanceform from "../components/userIssuanceform";
 import { modalSizes } from "../components/utils";
 
 function UsersPage() {
   const [users, setUsers] = useState([]);
   const [books, setBooks] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("");
   const [currentData, setCurrentData] = useState({});
@@ -65,14 +67,17 @@ function UsersPage() {
 
     if (trimmedSearchTerm.length >= 3 || trimmedSearchTerm.length === 0) {
       try {
+        setLoading(true);
+
         const data = await fetchUsers(currentPage, pageSize, trimmedSearchTerm);
         setUsers(data.content || []);
         setTotalPages(data.totalPages || 0);
       } catch (error) {
         console.error("Error fetching users:", error);
+      } finally {
+        setLoading(false);
       }
     } else if (trimmedSearchTerm.length > 0 && trimmedSearchTerm.length < 3) {
-      console.warn("Search term must be at least 3 characters.");
     } else {
       setUsers([]);
       setTotalPages(0);
@@ -88,7 +93,7 @@ function UsersPage() {
       const data = await fetchAllBooks();
       setBooks(data || []);
     } catch (error) {
-      console.error("Error fetching books:", error);
+      showFailureToast("Can't fetch Books")
     }
   };
 
@@ -114,35 +119,35 @@ function UsersPage() {
         userToUpdate.password = updatedUser.password;
       }
 
-      await updateUser(currentData.id, userToUpdate);
+      const response  = await updateUser(currentData.id, userToUpdate);
       getUsers();
       handleCloseModal();
-      showSuccessToast("User edit Success!");
+      showSuccessToast(response.message);
     } catch (error) {
       console.error("Failed to update user:", error);
-      showFailureToast("Failed to update User");
+      showFailureToast(error.response.data.message);
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await deleteUser(id);
+      const response = await deleteUser(id);
       setUsers(users.filter((user) => user.id !== id));
       handleCloseModal();
-      showSuccessToast("User Deleted successfully!");
+      showSuccessToast(response.message);
     } catch (error) {
-      showFailureToast("Failed to delete the user due its issuances!");
+      showFailureToast(error.response.data.message);
+      handleCloseModal();
     }
   };
 
   const handleIssueBook = async (issuanceDetails) => {
     try {
-      await addIssuance(issuanceDetails);
+      const response = await addIssuance(issuanceDetails);
       handleCloseModal();
-      showSuccessToast("Book Issued successfully!");
+      showSuccessToast(response.message);
     } catch (error) {
-      console.error("Failed to create issuance:", error);
-      showFailureToast("Failed to Issue Book!");
+      showFailureToast(error.response.data.message);
     }
   };
 
@@ -178,16 +183,15 @@ function UsersPage() {
     try {
       const updatedUserData = { ...userdata, role: "ROLE_USER" };
 
-      console.log("User registered-> " + JSON.stringify(updatedUserData));
-      await RegisterUser(updatedUserData);
+      const response = await RegisterUser(updatedUserData);
 
       getUsers();
 
       handleCloseModal();
-      showSuccessToast("User Registered successfully!");
+
+      showSuccessToast(response.message);
     } catch (error) {
-      console.log(error);
-      showFailureToast("User Failed to Register!");
+      showFailureToast(error.response.data.message);
     }
   };
 
@@ -249,18 +253,7 @@ function UsersPage() {
       ),
     },
   ];
-  const handleBookSelection = (e) => {
-    const selectedBookId = e.target.value;
 
-    if (books?.length) {
-      const selectedBook = books.find(
-        (book) => book.id === parseInt(selectedBookId, 10)
-      );
-      setSelectedBook(selectedBook);
-    } else {
-      console.error("Books array is not available.");
-    }
-  };
 
   return (
     <>
@@ -274,19 +267,22 @@ function UsersPage() {
             className="add"
           />
         </div>
-
-        <div className="table-container">
-          {users.length === 0 ? (
-            <p>No Issuances found</p>
-          ) : (
-            <Table
-              data={users}
-              columns={columns}
-              currentPage={currentPage}
-              pageSize={pageSize}
-            />
-          )}{" "}
-        </div>
+        
+        <Loader loading={loading}/>
+        
+          <div className="table-container">
+            {users.length === 0 ? (
+              <p>No Users found</p>
+            ) : (
+              <Table
+                data={users}
+                columns={columns}
+                currentPage={currentPage}
+                pageSize={pageSize}
+              />
+            )}
+          </div>
+        
 
         <div className="pagination-controls">
           <img
@@ -320,7 +316,7 @@ function UsersPage() {
         width={modalSizes.edit.width}
       >
         {modalType === "assign" ? (
-          <UserIssuanceform
+          <IssuanceForm
             onSubmit={handleIssueBook}
             selectedUser={currentData}
             onClose={handleCloseModal}
@@ -386,7 +382,7 @@ function UsersPage() {
               {
                 label: "Email",
                 name: "email",
-                type: "email",
+                type: "type",
                 placeholder: "Enter Email",
                 required: true,
 

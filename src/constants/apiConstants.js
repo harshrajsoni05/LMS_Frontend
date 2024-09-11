@@ -1,4 +1,3 @@
-
 export const BASE_API_URL = "/api";
 export const BOOKS_API_URL = `${BASE_API_URL}/books`;
 export const CATEGORIES_API_URL = `${BASE_API_URL}/categories`;

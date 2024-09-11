@@ -13,7 +13,7 @@ import SearchBar from "../components/searchbar";
 import WithLayoutComponent from "../hocs/WithLayoutComponent";
 import Dynamicform from "../components/dynamicform";
 import Tooltip from "../components/toolTip";
-import Toast from "../components/toast/toast";
+import Toast from "../components/toast";
 
 import back from "../assets/images/go-back.png";
 import next from "../assets/images/go-next.png";
@@ -85,28 +85,29 @@ function IssuancesPage() {
         issue_date: currentData.issue_date,
         return_date: updatedIssuance.return_date,
         status: updatedIssuance.status,
-        issuance_type: currentData.issuance_type,
+        issuance_type: updatedIssuance.issuance_type,
       };
 
-      await updateIssuance(currentData.id, issuanceToUpdate);
+      const response = await updateIssuance(currentData.id, issuanceToUpdate);
+      console.log("Issuance to update:", issuanceToUpdate); // Add this line to debug
+
       getIssuances();
       handleCloseModal();
-      showSuccessToast("Issuance Edited successfully!");
+      showSuccessToast(response.message)
     } catch (error) {
-      console.error("Failed to update issuance:", error);
-      showFailureToast("Failed to update Issuance");
+      showFailureToast(error.response.data.message);
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await deleteIssuance(id);
+      const response = await deleteIssuance(id);
       setIssuances(issuances.filter((issuance) => issuance.id !== id));
+
       handleCloseModal();
-      showSuccessToast("Issuance Deleted successfully!");
+      showSuccessToast(response.message);
     } catch (error) {
-      console.error("Failed to delete the issuance:", error);
-      showFailureToast("Failed to Delete Issuance");
+      showFailureToast(error.response.data.message);
     }
   };
 
@@ -139,6 +140,7 @@ function IssuancesPage() {
   const handleSubmitModal = (data) => {
     if (modalType === "edit") {
       handleEditIssuance(data);
+      console.log('data->>>>>>>>>>>>>',data)
     }
   };
 
@@ -153,8 +155,7 @@ function IssuancesPage() {
         return (
           rowData.issue_date.split("T")[0] +
           " " +
-          rowData.issue_date.split("T")[1].split(".")[0]
-        );
+          rowData.issue_date.split("T")[1].split(".")[0].slice(0, -3));
       },
     },
     {
@@ -171,11 +172,11 @@ function IssuancesPage() {
         if (rowData.issuance_type === "In House") {
           return (
             rowData.return_date.split("T")[0] +
-            " " +
-            rowData.return_date.split("T")[1].split(".")[0]
+            "  " +
+            rowData.return_date.split("T")[1].split(".")[0].slice(0, -3)
           );
         } else if (rowData.issuance_type === "Library") {
-          return rowData.return_date.split("T")[1].split(".")[0];
+          return rowData.return_date.split("T")[1].split(".")[0].slice(0, -3)
         }
         return "N/A";
       },
@@ -264,30 +265,30 @@ function IssuancesPage() {
 
       <CustomModal isOpen={isModalOpen} onClose={handleCloseModal}>
         {modalType === "edit" ? (
-          <Dynamicform
-            heading="Edit Issuance"
-            fields={[
-              {
-                label: "Status",
-                name: "status",
-                type: "select",
-                placeholder: "Status",
-                required: true,
-                options: [
-                  { value: "Returned", label: "Returned" },
-                  { value: "Pending", label: "Pending" },
-                ],
-                defaultValue: currentData.status,
-              },
-              {
-                name: "return_date",
-                label: "Return date",
-                type: "datetime-local",
-                placeholder: "Return Date",
-                required: false,
-                defaultValue: currentData.return_date,
-              },
-            ]}
+           <Dynamicform
+           heading="Edit Issuance"
+           fields={[
+             {
+               label: "Status",
+               name: "status",
+               type: "select",
+               placeholder: "Status",
+               required: true,
+               options: [
+                 { value: "Issued", label: "Issued" },
+                 { value: "Returned", label: "Returned" },
+                 // Add other options if needed
+               ],
+             },
+             {
+               name: "return_date",
+               label: "Return date",
+               type: "datetime-local",
+               placeholder: "Return Date",
+               required: false,
+               defaultValue: currentData.return_date,
+             },
+           ]}
             onSubmit={handleSubmitModal}
             onCancel={handleCloseModal}
             defaultValues={currentData}

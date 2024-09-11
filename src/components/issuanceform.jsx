@@ -1,42 +1,77 @@
+
+
 import { useState } from "react";
-import "../styles/Issuanceform.css";
+import { findBookSuggestions } from "../api/BookServices";
 import { SearchByNumber as findUserByMobile } from "../api/UserServices";
-import CustomButton from "../components/button";
+import "../styles/Issuanceform.css";
+import CustomButton from "./button";
 import { formatDateTime } from "./utils";
 
-const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
-  const [userMobileNumber, setUserMobileNumber] = useState("");
+const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
 
-  const [issue_date, setIssueDate] = useState(() => {
+  const [bookTitle, setBookTitle] = useState(selectedBook?.title || "");
+  const [book_id, setBookId] = useState(selectedBook?.id || null);
+
+  const [userMobileNumber, setUserMobileNumber] = useState(selectedUser?.mobile || "");
+  const [user_id, setUserId] = useState(selectedUser?.id || null);
+  
+  const [issuance_type, setIssuanceType] = useState("In House");
+  const [expectedReturn, setExpectedReturn] = useState("");
+  const [issue_date] = useState(() => {
     const date = new Date();
-
     const istOffset = 5 * 60 + 30;
     const istTime = new Date(date.getTime() + istOffset * 60 * 1000);
-    const formattedDate = istTime.toISOString().split(".")[0];
-
-    return formattedDate;
+    return istTime.toISOString().split('.')[0];
   });
-  const [expectedReturn, setExpectedReturn] = useState("");
-
-  const [user_id, setuser_id] = useState(null);
-  const [issuance_type, setIssuanceType] = useState("In House");
   const [errorMessage, setErrorMessage] = useState("");
   const [returnTime, setReturnTime] = useState("");
+  const [bookSuggestions, setBookSuggestions] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const fetchBookSuggestions = async (query) => {
+    if (query.length < 2) {
+      setBookSuggestions([]);
+      setShowDropdown(false);
+      return;
+    }
+    try {
+      const suggestions = await findBookSuggestions(query);
+      setBookSuggestions(suggestions);
+      setShowDropdown(true);
+    } catch (error) {
+      console.error("Failed to fetch book suggestions:", error);
+      setBookSuggestions([]);
+    }
+  };
+
+  const handleBookTitleChange = (e) => {
+    const title = e.target.value;
+    setBookTitle(title);
+    setBookId(null);
+    fetchBookSuggestions(title);
+  };
+
+  const handleSuggestionClick = (book) => {
+    setBookTitle(book.title);
+    setBookId(book.id);
+    setErrorMessage("");
+    setShowDropdown(false);
+  };
 
   const fetchUserDetails = async (mobileNumber) => {
     try {
       const userDetails = await findUserByMobile(mobileNumber);
       if (userDetails.content && userDetails.content.length > 0) {
         const user = userDetails.content[0];
-        setuser_id(user.id);
+        setUserId(user.id);
         setErrorMessage("");
       } else {
-        setuser_id(null);
+        setUserId(null);
         setErrorMessage("User not found. Please register first.");
       }
     } catch (error) {
       console.error("Failed to fetch user details:", error);
-      setuser_id(null);
+      setUserId(null);
       setErrorMessage("User not found. Please register first.");
     }
   };
@@ -47,7 +82,7 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
     if (mobileNumber.length >= 10) {
       fetchUserDetails(mobileNumber);
     } else {
-      setuser_id(null);
+      setUserId(null);
       setErrorMessage("");
     }
   };
@@ -55,30 +90,22 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
 
-    if (!userMobileNumber || userMobileNumber.length < 10) {
-      setErrorMessage("Please enter a valid mobile number.");
-      return;
-    }
-
-    if (!user_id) {
-      setErrorMessage("User not found. Please enter a valid mobile number.");
+    if (!book_id || !user_id) {
+      setErrorMessage("Please enter valid details.");
       return;
     }
 
     let returnedAt = null;
-
     if (issuance_type === "In House" && expectedReturn) {
       returnedAt = formatDateTime(new Date(expectedReturn).toLocaleString());
     } else if (issuance_type === "Library" && returnTime) {
       const currentDate = new Date().toISOString().slice(0, 10);
-      returnedAt = formatDateTime(
-        new Date(`${currentDate}T${returnTime}`).toLocaleString()
-      );
+      returnedAt = formatDateTime(new Date(`${currentDate}T${returnTime}`).toLocaleString());
     }
 
     const issuanceDetails = {
       user_id,
-      book_id: selectedBook.id,
+      book_id,
       issue_date,
       return_date: returnedAt,
       status: "Issued",
@@ -89,33 +116,58 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
     onClose();
   };
 
-  const todayDate = new Date().toISOString().split("T")[0];
   const now = new Date().toISOString().slice(0, 16);
 
   return (
     <div className="issuance-form">
-      <h2>
-        Issue Book <br />
-        <span>{selectedBook.title}</span>
-      </h2>
+      <h2>Issue Book</h2>
       <form onSubmit={handleSubmit}>
         {errorMessage && <p className="error-message">{errorMessage}</p>}
-        <div className="form-group">
-          <label>Mobile Number</label>
-          <input
-            type="text"
-            value={userMobileNumber}
-            onChange={handleMobileNumberChange}
-            placeholder="Enter User Mobile Number"
-          />
-        </div>
+        {selectedBook ? (
+          <>
+            <div className="form-group">
+              <label>Mobile Number</label>
+              <input
+                type="text"
+                value={userMobileNumber}
+                onChange={handleMobileNumberChange}
+                placeholder="Enter User Mobile Number"
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="form-group">
+              <label>Book Title</label>
+              <input
+                type="text"
+                value={bookTitle}
+                onChange={handleBookTitleChange}
+                placeholder="Enter Book Title"
+              />
+              {showDropdown && bookSuggestions.length > 0 && (
+                <ul className="dropdown-suggestions">
+                  {bookSuggestions.map((book) => (
+                    <li key={book.id} onClick={() => {
+                      if(book.quantity>0){
+                        handleSuggestionClick(book)
+                      }
+                      }} className={book.quantity === 0?'disabled':''}>
+                      {book.title}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </>
+        )}
         <div className="form-group">
           <label>Issuance Type</label>
           <select
             value={issuance_type}
             onChange={(e) => setIssuanceType(e.target.value)}
           >
-            <option value="In House">Takeway</option>
+            <option value="In House">Takeaway</option>
             <option value="Library">In House</option>
           </select>
         </div>
@@ -126,7 +178,7 @@ const IssuanceForm = ({ onSubmit, selectedBook, onClose }) => {
               type="datetime-local"
               value={expectedReturn}
               onChange={(e) => setExpectedReturn(e.target.value)}
-              min={todayDate}
+              min={now}
             />
           </div>
         ) : (

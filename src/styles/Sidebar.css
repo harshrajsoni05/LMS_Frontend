@@ -75,7 +75,7 @@
 }
 
 
-@media (max-width: 768px) {
+@media (max-width: 1300px) {
   .sidebar-menu {
     height: 85.5vh;
     padding: 15px;

@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
+//apis
 import {
   fetchBooks,
   addBook,
   updateBook,
   deleteBook,
-  assignBookToUser,
+  fetchAllBooks,
 } from "../api/BookServices";
 import { fetchAllCategories } from "../api/CategoryServices";
 import { addIssuance } from "../api/IssuanceServices";
@@ -17,9 +18,11 @@ import CustomModal from "../components/modal";
 import Table from "../components/table";
 import Searchbar from "../components/searchbar";
 import Dynamicform from "../components/dynamicform";
-import WithLayoutComponent from "../hocs/WithLayoutComponent";
 import Tooltip from "../components/toolTip";
-import Toast from "../components/toast/toast";
+import Toast from "../components/toast";
+import IssuanceForm from "../components/issuanceform";
+import { modalSizes } from "../components/utils";
+import HOC from "../hocs/WithLayoutComponent";
 
 //images
 import EditIcon from "../assets/images/editicon.png";
@@ -28,14 +31,10 @@ import historyicon from "../assets/images/historyicon.png";
 import back from "../assets/images/go-back.png";
 import next from "../assets/images/go-next.png";
 import AssignUser from "../assets/images/alloticon.png";
-import IssuanceForm from "../components/issuanceform";
-import { modalSizes } from "../components/utils";
-import HOC from "../hocs/WithLayoutComponent";
 
-
-
-function BooksPage(){
+function BooksPage() {
   const navigate = useNavigate();
+
   
   const [books, setBooks] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -59,12 +58,12 @@ function BooksPage(){
 
   const [phoneNumber, setPhoneNumber] = useState("");
   const [issuanceType, setIssuanceType] = useState("library");
-  const [isIssuanceModalOpen, setIsIssuanceModalOpen] = useState(false);
   const [userNotRegistered, setUserNotRegistered] = useState(false);
 
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState("success");
   const [toastMessage, setToastMessage] = useState("");
+
   const showSuccessToast = (message) => {
     setToastType("success");
     setToastMessage(message);
@@ -75,9 +74,9 @@ function BooksPage(){
     setToastMessage(message);
     setShowToast(true);
   };
-  
+
   const getBooks = async () => {
-    const trimmedSearchTerm = searchTerm.trim(); 
+    const trimmedSearchTerm = searchTerm.trim();
   
     if (trimmedSearchTerm.length >= 3 || trimmedSearchTerm.length === 0) {
       try {
@@ -85,26 +84,25 @@ function BooksPage(){
         setBooks(data.content || []);
         setTotalPages(data.totalPages || 0);
       } catch (error) {
-        console.error("Error fetching books:", error);
+        showFailureToast("Can't Fetch Books");
       }
-    } else if (trimmedSearchTerm.length > 0 && trimmedSearchTerm.length < 3) {
+    } else if (trimmedSearchTerm.length < 3 && trimmedSearchTerm.length > 0) {
     } else {
-      setBooks([]);
+      fetchBooks([]);
       setTotalPages(0);
     }
   };
-  
 
   useEffect(() => {
     getBooks();
-  }, [currentPage, searchTerm]);
+  },[currentPage, searchTerm] );
 
   const getCategories = async () => {
     try {
       const data = await fetchAllCategories();
       setCategories(data || []);
     } catch (error) {
-      showFailureToast("Can't fetch Books!")
+      showFailureToast("Can't fetch Books!");
     }
   };
 
@@ -121,17 +119,16 @@ function BooksPage(){
         quantity: parseInt(newBook.quantity, 10),
         imageURL: newBook.imageURL ? newBook.imageURL.trim() : "",
       };
-      await addBook(bookToCreate);
+      const response = await addBook(bookToCreate);
       getBooks();
-      showSuccessToast("Book added successfully!");
+      showSuccessToast(response.message);
       handleCloseModal();
     } catch (error) {
-      showFailureToast("Failed to add book!");
+      showFailureToast(error.response.data.message);
       handleCloseModal();
-
     }
   };
-  
+
   const handleEditBook = async (updatedBook) => {
     try {
       const bookToUpdate = {
@@ -142,42 +139,37 @@ function BooksPage(){
         quantity: parseInt(updatedBook.quantity, 10),
         imageURL: updatedBook.imageURL ? updatedBook.imageURL.trim() : "",
       };
-      await updateBook(currentData.id, bookToUpdate);
+      const response  = await updateBook(currentData.id, bookToUpdate);
       getBooks();
       handleCloseModal();
-      showSuccessToast("Book edited successfully!");
+      showSuccessToast(response.message);
     } catch (error) {
-      console.error("Failed to update book:", error);
-      showFailureToast("Failed to update book!");
-
+      showFailureToast(error.response.data.message);
     }
   };
-  
+
   const handleDelete = async (rowData) => {
     const id = rowData.id;
     try {
-      await deleteBook(id);
+      const response = await deleteBook(id);
       setBooks(books.filter((book) => book.id !== id));
-      showSuccessToast("Book deleted successfully!");
+      showSuccessToast(response.message);
       handleCloseModal();
     } catch (error) {
-      console.error("Failed to delete the book", error);
-      showFailureToast("Cannot delete. Book has been issued!");
+      showFailureToast(error.response.data.message);
       handleCloseModal();
-
     }
   };
-  
 
   const handleIssuanceSubmit = async (issuanceDetails) => {
     try {
-      console.log(issuanceDetails);
       const response = await addIssuance(issuanceDetails);
-
       getBooks();
-      showSuccessToast("Issued book Successfully!");
+      
+      showSuccessToast(response.message);
+      return response.data
     } catch (error) {
-      showFailureToast("Failed Issuance!");
+      showFailureToast(error.response.data.message);
     }
   };
 
@@ -225,7 +217,7 @@ function BooksPage(){
     }
   };
 
-   const [columns] = useState([
+  const [columns] = useState([
     { header: "Title", accessor: "title" },
     { header: "Author", accessor: "author" },
     { header: "Category", render: (rowData) => rowData.category.name },
@@ -242,12 +234,20 @@ function BooksPage(){
         <img
           src={AssignUser}
           alt="Assign User"
-          style={{ paddingLeft: "0" }}
-          className="action-icon"
-          onClick={() => handleOpenModal("assign", rowData)}
+          style={{
+            paddingLeft: "0",
+            opacity: rowData.quantity === 0 ? 0.5 : 1,
+            cursor: rowData.quantity === 0 ? 'not-allowed' : 'pointer'
+          }}
+          className={`action-icon ${rowData.quantity === 0 ? 'disabled' : ''}`}
+          onClick={() => {
+            if (rowData.quantity > 0) {
+              handleOpenModal("assign", rowData);
+            }
+          }}
         />
       </Tooltip>
-
+  
       <Tooltip message="Edit">
         <img
           src={EditIcon}
@@ -256,28 +256,29 @@ function BooksPage(){
           onClick={() => handleOpenModal("edit", rowData)}
         />
       </Tooltip>
-
+  
       <Tooltip message="Records">
         <img
           src={historyicon}
-          alt="history"
+          alt="History"
           className="action-icon"
           onClick={() =>
             navigate(`/history/book/${rowData.id}`, { state: { rowData } })
           }
         />
       </Tooltip>
-
+  
       <Tooltip message="Delete">
         <img
           src={DeleteIcon}
           alt="Delete"
           className="action-icon"
-          onClick={() => handleOpenModal("delete", rowData)} // pass rowData for deletion
+          onClick={() => handleOpenModal("delete", rowData)}
         />
       </Tooltip>
     </div>
   );
+  
 
   return (
     <>
@@ -299,7 +300,6 @@ function BooksPage(){
             <Table data={books} columns={columns} />
           )}
         </div>
-
 
         <div className="pagination-controls">
           <img
@@ -416,6 +416,5 @@ function BooksPage(){
     </>
   );
 }
-
 
 export default HOC(BooksPage);

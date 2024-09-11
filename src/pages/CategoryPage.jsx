@@ -11,14 +11,14 @@ import Dynamicform from "../components/dynamicform";
 import EditIcon from "../assets/images/editicon.png";
 import DeleteIcon from "../assets/images/deleteicon.png";
 import Tooltip from "../components/toolTip";
-import Toast from "../components/toast/toast";
+import Toast from "../components/toast";
 import { modalSizes } from "../components/utils";
 
 
 const CategoryPage = ()=> {
   const [categories, setCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState(""); // 'edit' or 'add'
+  const [modalType, setModalType] = useState(""); 
   const [currentData, setCurrentData] = useState({
     name: "",
     description: "",
@@ -72,19 +72,20 @@ const CategoryPage = ()=> {
         description: newCategory.description,
       };
   
-      await addCategory(categoryToCreate);
-
+      const response = await addCategory(categoryToCreate);
+  
+      const successMessage = response.message ;
+  
       getCategories();
       handleCloseModal();
-      showSuccessToast("Category added successfully!");
-
+      showSuccessToast(successMessage);
+  
     } catch (error) {
       handleCloseModal();
-
-      showFailureToast("Failed to add category",error)
-      
+      showFailureToast(error.response.data.message);
     }
   };
+  
 
   const handleEditCategory = async (updatedCategory) => {
     try {
@@ -94,26 +95,31 @@ const CategoryPage = ()=> {
         description: updatedCategory.description,
       };
 
-      await updateCategory(currentData.id, categoryToUpdate);
+      const response = await updateCategory(currentData.id, categoryToUpdate);
       getCategories();
+
+      const successMessage = response.message ;
       handleCloseModal();
-      showSuccessToast("Category Edited!");
+      showSuccessToast(successMessage);
 
     } catch (error) {
-      showSuccessToast("Category Edit Failed!");
+      showFailureToast(error.response.data.message);
 
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      await deleteCategory(id);
+      const response = await deleteCategory(id);
       setCategories(categories.filter((category) => category.id !== id));
-      showSuccessToast("Category Deleted Succesfully!");
+      getCategories();
+
+      showSuccessToast(response.message);
       handleCloseModal();
 
     } catch (error) {
-      showFailureToast("Cannot Delete Category as it has Issued Books!")
+      console.log(error)
+      showFailureToast(error.response.data.message)
       handleCloseModal()
     }
   };

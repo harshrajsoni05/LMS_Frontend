@@ -1,27 +1,21 @@
-import {
-  fetchDataWithPagination,
-  addData,
-  updateData,
-  deleteData,
-} from "./ApiManager";
-import axiosInstance from "./AxiosInstance";
+import { put, post, del, getPage } from "./ApiManager";
 import { USERS_API_URL } from "../constants/apiConstants";
+import { axiosInstance } from "./ApiManager";
 
-
-const fetchUsers = async (page = 0, pageSize = 7, search = "") => {
-  return await fetchDataWithPagination(USERS_API_URL, page, pageSize, search);
+const fetchUsers = async (page = 0, pageSize = 7, search = "" , role) => {
+  return await getPage(USERS_API_URL, page, pageSize, search , "ROLE_USER");
 };
 
 const RegisterUser = async (userData) => {
-  return await addData(USERS_API_URL, userData);
+  return await post(USERS_API_URL, userData);
 };
 
 const updateUser = async (id, userData) => {
-  return await updateData(USERS_API_URL, id, userData);
+  return await put(USERS_API_URL, id, userData);
 };
 
 const deleteUser = async (id) => {
-  return await deleteData(USERS_API_URL, id);
+  return await del(USERS_API_URL, id);
 };
 
 const SearchByNumber = async (number) => {
@@ -36,12 +30,4 @@ const SearchByNumber = async (number) => {
   }
 };
 
-
-export {
-  fetchUsers,
-  RegisterUser,
-  updateUser,
-  deleteUser,
-  SearchByNumber,
-  
-};
+export { fetchUsers, RegisterUser, updateUser, deleteUser, SearchByNumber };

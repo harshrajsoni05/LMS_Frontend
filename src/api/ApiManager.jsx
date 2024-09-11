@@ -1,24 +1,26 @@
 
-import axiosInstance from "./AxiosInstance";
+import axios from "axios";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "../constants/apiConstants";
 
-const fetchDataWithPagination = async (baseUrl, page = DEFAULT_PAGE, pageSize = DEFAULT_PAGE_SIZE, search = "") => {
-  try {
-    const trimmedSearchTerm = search.trim();
-    const response = await axiosInstance.get(baseUrl, {
-      params: {
-        page: page,
-        size: pageSize,
-        search: trimmedSearchTerm,
-      },
-    });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
-};
+const axiosInstance = axios.create({
+  baseURL: "http://localhost:8080/",
+});
 
-const fetchAllData = async (baseUrl) => {
+axiosInstance.interceptors.request.use(
+  (config) => {
+    const jwtToken = localStorage.getItem("jwtToken"); 
+    if (jwtToken) {
+      config.headers.Authorization = `Bearer ${jwtToken}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+
+const get = async (baseUrl) => {
   try {
     const response = await axiosInstance.get(`${baseUrl}/all`);
     return response.data;
@@ -27,7 +29,7 @@ const fetchAllData = async (baseUrl) => {
   }
 };
 
-const addData = async (baseUrl, data) => {
+const post = async (baseUrl, data) => {
   try {
     const response = await axiosInstance.post(baseUrl, data);
     return response.data;
@@ -36,7 +38,7 @@ const addData = async (baseUrl, data) => {
   }
 };
 
-const updateData = async (baseUrl, id, data) => {
+const put = async (baseUrl, id, data) => {
   try {
     if (!id || !data) {
       throw new Error("ID and data are required for updating.");
@@ -48,12 +50,30 @@ const updateData = async (baseUrl, id, data) => {
   }
 };
 
-const deleteData = async (baseUrl, id) => {
+const del = async (baseUrl, id) => {
   try {
-    await axiosInstance.delete(`${baseUrl}/${id}`);
+    const response = await axiosInstance.delete(`${baseUrl}/${id}`);
+    return response.data
   } catch (error) {
     throw error;
   }
 };
 
-export { fetchDataWithPagination, fetchAllData, addData, updateData, deleteData };
+const getPage = async (baseUrl, page = DEFAULT_PAGE, pageSize = DEFAULT_PAGE_SIZE, search = "" , role) => {
+  try {
+    const trimmedSearchTerm = search.trim();
+    const response = await axiosInstance.get(baseUrl, {
+      params: {
+        page: page,
+        size: pageSize,
+        search: trimmedSearchTerm,
+        role: role
+      },
+    });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export { get, put, post, del, getPage, axiosInstance};

@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 export const validateEmailOrMobile = (input) => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const mobilePattern = /^[0-9]{10}$/;
@@ -31,12 +33,12 @@ export const formatDateTime = (date) => {
     const minutes = String(d.getMinutes()).padStart(2, '0');
     const seconds = String(d.getSeconds()).padStart(2, '0');
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-  };
+};
 
   
 
 export const modalSizes = {
-    edit: { height: 'auto', width: '280px' },
+    edit: { height: 'auto', width: '330px' },
     add: { height: '500px', width: '600px' },
     assign: { height: '400px', width: '500px' },
     delete: { height: 'auto', width: '400px' }

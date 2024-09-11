@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import "../styles/Dynamicform.css";
 import CustomButton from '../components/button';
-import { validateEmail } from './utils';
+import { formatDateTime, validateEmail, validateMobile } from './utils';
 
 const Dynamicform = ({ fields, onSubmit, heading, defaultValues }) => {
   const [formData, setFormData] = useState({});
@@ -10,6 +10,16 @@ const Dynamicform = ({ fields, onSubmit, heading, defaultValues }) => {
   useEffect(() => {
     setFormData(defaultValues || {});
   }, [defaultValues]);
+
+  const getCurrentDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
 
   const handleInputChange = (e) => {
     const { name, value, type } = e.target;
@@ -20,6 +30,7 @@ const Dynamicform = ({ fields, onSubmit, heading, defaultValues }) => {
         setErrors({ ...errors, [name]: "Only positive integers are allowed" });
         return;
       }
+      
     }
     setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: '' });
@@ -40,10 +51,16 @@ const Dynamicform = ({ fields, onSubmit, heading, defaultValues }) => {
       if ((field.type === 'time' || field.type === 'datetime-local') && !value) {
         newErrors[field.name] = `${field.placeholder} cannot be empty`;
       }
-
+      
       if (field.name === 'email' && value && !validateEmail(value)) {
         newErrors[field.name] = `Enter a valid Email Address`;
       }
+      if (field.placeholder === 'Enter Phone Number' && value) {
+        if (!validateMobile(value)) {
+          newErrors[field.name] = `Phone number must be a valid 10 digits`;
+        }
+      }
+
     });
 
     if (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword) {
@@ -101,6 +118,8 @@ const Dynamicform = ({ fields, onSubmit, heading, defaultValues }) => {
                   name={field.name}
                   value={formData[field.name] || ""}
                   onChange={handleInputChange}
+                  min={field.type === 'datetime-local' ? getCurrentDateTime() : undefined}
+
                 />
               )}
 

@@ -104,6 +104,12 @@
 .modal-form-input select::-webkit-scrollbar {
   display: none;
 }
+.dropdown-suggestions .disabled {
+  color: #aaa;
+  cursor: not-allowed; 
+  pointer-events: none; 
+  /* background-color: #d3d3d3; */
+}
 
 @media (max-width: 768px) {
   .form-group {

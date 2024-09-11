@@ -1,5 +1,4 @@
-import axiosInstance from "./AxiosInstance";
-
+import { axiosInstance } from "./ApiManager";
 const fetchDashboardCounts = async () => {
   try {
     const response = await axiosInstance.get("api/dashboard/counts");

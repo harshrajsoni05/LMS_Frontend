@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 
 import '../styles/LoginForm.css'
 
-import Toast from './toast/toast';
+import Toast from './toast';
 
 import { login } from '../api/Auth';
 import { loginUser } from '../redux/authActions';

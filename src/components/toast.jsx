@@ -1,6 +1,6 @@
 
 import React, { useEffect } from 'react';
-import './toast.css';
+import '../styles/Toast.css';
 
 const Toast = ({ type, message, duration = 3000, onClose }) => {
   useEffect(() => {
