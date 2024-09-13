@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, cleanup } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import Toast from '../components/toast/toast';
+import Toast from '../components/toast';
 
 describe('Toast', () => {
   jest.useFakeTimers(); 

@@ -8,10 +8,12 @@ import democracy from "../assets/images/democracy.png";
 import userss from "../assets/images/userss.png";
 
 import withLayout from "../hocs/WithLayoutComponent";
+import Loader from "./loader";
 
 const LatestBooks = ({ books }) => {
   return (
     <div className="latest-books-container">
+
       {books.map((book) => (
         <div key={book.id} className="book-card">
           <img src={book.imageURL} alt={book.title} className="book-image" />
@@ -32,8 +34,10 @@ const Dashboard = () => {
   });
 
   const [latestBooks, setLatestBooks] = useState([]);
+  const [loading,setloading] = useState(false);
 
-  useEffect(() => {
+   useEffect(() => {
+    setloading(true)
     const fetchData = async () => {
       try {
         const [dashboardData, recentBooks] = await Promise.all([
@@ -51,6 +55,8 @@ const Dashboard = () => {
         setLatestBooks(recentBooks);
       } catch (error) {
         console.error("Error fetching dashboard data", error);
+      } finally {
+        setloading(false)
       }
     };
 
@@ -59,34 +65,41 @@ const Dashboard = () => {
 
   return (
     <div className="container-dashboard">
-      <div className="dashboard">
-        <div className="dashboard-card">
-          <img src={books} alt="Books" />
-          <h2>Total Books</h2>
-          <p>{data.booksCount}</p>
-        </div>
-        <div className="dashboard-card">
-          <img src={userss} alt="Users" />
-          <h2>Total Users</h2>
-          <p>{data.usersCount}</p>
-        </div>
-        <div className="dashboard-card">
-          <img src={categories} alt="Categories" />
-          <h2>Categories</h2>
-          <p>{data.categoriesCount}</p>
-        </div>
-        <div className="dashboard-card">
-          <img src={democracy} alt="Issued Books" />
-          <h2>Issued Books</h2>
-          <p>{data.issuancesCount}</p>
-        </div>
-      </div>
-      <div className="recent-books-heading">
-        <p>Recently Added Collection</p>
-      </div>
-      <LatestBooks books={latestBooks} />
+      {loading ? (
+        <Loader /> 
+      ) : (
+        <>
+          <div className="dashboard">
+            <div className="dashboard-card">
+              <img src={books} alt="Books" />
+              <h2>Total Books</h2>
+              <p>{data.booksCount}</p>
+            </div>
+            <div className="dashboard-card">
+              <img src={userss} alt="Users" />
+              <h2>Total Users</h2>
+              <p>{data.usersCount}</p>
+            </div>
+            <div className="dashboard-card">
+              <img src={categories} alt="Categories" />
+              <h2>Categories</h2>
+              <p>{data.categoriesCount}</p>
+            </div>
+            <div className="dashboard-card">
+              <img src={democracy} alt="Issued Books" />
+              <h2>Issued Books</h2>
+              <p>{data.issuancesCount}</p>
+            </div>
+          </div>
+          <div className="recent-books-heading">
+            <p>Recently Added Collection</p>
+          </div>
+          <LatestBooks books={latestBooks} />
+        </>
+      )}
     </div>
   );
 };
+    
 
 export const DashboardwithLayout = withLayout(Dashboard);

@@ -7,9 +7,8 @@
 ::placeholder {
   font-family: "Poppins", sans-serif;
   font-weight: 400;
+  font-size: 0.75rem;
 }
-
-
 
 .login-form h2 {
   font-size: 1.4rem;
@@ -30,11 +29,11 @@
 .input-group input {
   width: 80%;
   padding: 10px;
-  margin: 0.35rem auto;
+  margin: 0.35rem auto 0 0 ;
   background-color: #effafc;
   border: 1px solid #ccc;
   border-radius: 30px;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   color: #333; 
 }
 
@@ -60,7 +59,9 @@
 
 .login-form p {
   margin-top: 10px;
-  font-size: 14px;
+  font-size: 0.8rem;
+  font-weight: 500;
+
 }
 
 .role-selection input[type="radio"] {

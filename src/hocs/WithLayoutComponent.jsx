@@ -1,6 +1,6 @@
 import Header from '../components/header'; 
 import Sidebar from '../components/sidebar';
-import './Hoc.css';
+import '../styles/Hoc.css';
 
 const HOC = (Component) => {
   return function Hoc(props) {

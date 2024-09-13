@@ -1,7 +1,7 @@
 import '../styles/Action.css';
-import allotIcon from '../assets/images/alloticon.png'; // Replace with the actual path to your image
-import editIcon from '../assets/images/editicon.png';   // Replace with the actual path to your image
-import deleteIcon from '../assets/images/deleteicon.png'; // Replace with the actual path to your image
+import allotIcon from '../assets/images/alloticon.png'; 
+import editIcon from '../assets/images/editicon.png';   
+import deleteIcon from '../assets/images/deleteicon.png'; 
 
 function Action({ onAllot, onEdit, onDelete }) {
     return (

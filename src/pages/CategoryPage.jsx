@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { fetchCategories, addCategory, updateCategory, deleteCategory } from "../api/CategoryServices"; // Adjust the import path as needed
+import { fetchCategories, addCategory, updateCategory, deleteCategory } from "../api/CategoryServices"; 
 import CustomButton from "../components/button";
 import CustomModal from "../components/modal";
 import Table from "../components/table";
@@ -13,9 +13,11 @@ import DeleteIcon from "../assets/images/deleteicon.png";
 import Tooltip from "../components/toolTip";
 import Toast from "../components/toast";
 import { modalSizes } from "../components/utils";
+import Loader from "../components/loader";
 
 
 const CategoryPage = ()=> {
+  const [loading,setloading]= useState(false);
   const [categories, setCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState(""); 
@@ -43,6 +45,7 @@ const CategoryPage = ()=> {
   };
 
   const getCategories = async () => {
+    setloading(true);
     const trimmedSearchTerm = searchTerm.trim();
   
     if (trimmedSearchTerm.length >= 3 || trimmedSearchTerm.length === 0) {
@@ -52,13 +55,21 @@ const CategoryPage = ()=> {
         setTotalPages(data.totalPages || 0);
       } catch (error) {
         showFailureToast("Can't Fetch Categories");
+      }finally{
+        setloading(false)
       }
     } else if (trimmedSearchTerm.length < 3 && trimmedSearchTerm.length > 0) {
+      setloading(false);
+
     } else {
+      setloading(false);
+
       setCategories([]);
       setTotalPages(0);
     }
   };
+
+  
   
 
   useEffect(() => {
@@ -67,6 +78,7 @@ const CategoryPage = ()=> {
 
   const handleAddCategory = async (newCategory) => {
     try {
+      setloading(true)
       const categoryToCreate = {
         name: newCategory.name.trim(),
         description: newCategory.description,
@@ -83,13 +95,19 @@ const CategoryPage = ()=> {
     } catch (error) {
       handleCloseModal();
       showFailureToast(error.response.data.message);
+    } finally{
+      setloading(false)
+
     }
   };
   
 
   const handleEditCategory = async (updatedCategory) => {
     try {
+      setloading(true)
+
       const categoryToUpdate = {
+
         id: currentData.id,
         name: updatedCategory.name.trim(),
         description: updatedCategory.description,
@@ -105,11 +123,16 @@ const CategoryPage = ()=> {
     } catch (error) {
       showFailureToast(error.response.data.message);
 
+    } finally{
+      setloading(false)
+
     }
   };
 
   const handleDelete = async (id) => {
     try {
+      setloading(true)
+
       const response = await deleteCategory(id);
       setCategories(categories.filter((category) => category.id !== id));
       getCategories();
@@ -118,9 +141,11 @@ const CategoryPage = ()=> {
       handleCloseModal();
 
     } catch (error) {
-      console.log(error)
       showFailureToast(error.response.data.message)
       handleCloseModal()
+    } finally{
+      setloading(false)
+
     }
   };
 
@@ -201,13 +226,16 @@ const CategoryPage = ()=> {
             className="add"
           />
         </div>
-
-        <div className="table-container">
-          {categories.length === 0 ? (<p>No Category found</p>):
-          (<Table data={categories} columns={columns} currentPage={currentPage} pageSize={pageSize}  />
-          )}
+        {loading ? (<Loader /> ) : (
+          <div className="table-container">
+            {categories.length === 0 ? (
+              <p>No Category found</p>
+            ) : (
+              <Table data={categories} columns={columns} currentPage={currentPage} pageSize={pageSize} />
+            )}
           </div>
-
+        )}
+        
         <div className="pagination-controls">
           <img
             src={back}

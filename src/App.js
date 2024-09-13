@@ -35,7 +35,6 @@ function App() {
       dispatch(loginUser(data));
       window.localStorage.setItem('jwtToken', data.jwtToken);
     } catch (error) {
-      console.log(error);
       navigate('/');
     }
   }

@@ -1,5 +1,5 @@
 import '../styles/LoginPage.css';
-import backgroundImage from '../assets/images/2.jpg'; // Adjust the path as necessary
+import backgroundImage from '../assets/images/2.jpg'; 
 import LoginForm from '../components/loginform';
 
 const LoginPage = () => {

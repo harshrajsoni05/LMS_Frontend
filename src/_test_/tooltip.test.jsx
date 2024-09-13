@@ -23,17 +23,7 @@ describe('Tooltip Component', () => {
     expect(screen.getByText('This is a tooltip')).toBeInTheDocument();
   });
 
-//   test('tooltip message should be hidden initially (if you have visibility logic)', () => {
-//     render(
-//       <Tooltip message="This is a tooltip">
-//         <button>Hover over me</button>
-//       </Tooltip>
-//     );
 
-//     const tooltipMessage = screen.getByText('This is a tooltip');
-//     expect(tooltipMessage).toHaveClass('tooltip-text');
-//     expect(tooltipMessage).toHaveStyle('visibility: hidden'); 
-//   });
 
   test('tooltip should display on hover', () => {
     render(

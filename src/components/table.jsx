@@ -9,7 +9,7 @@ const Table = ({ data, columns, currentPage, pageSize }) => {
   const toggleFilter = (filterType) => {
     if (filterType === "status") {
       setStatusFilter((prev) =>
-        prev === "Returned" ? "Pending" : prev === "Pending" ? null : "Returned"
+        prev === "Returned" ? "Issued" : prev === "Issued" ? null : "Returned"
       );
     } else if (filterType === "issuance_type") {
       setIssuanceTypeFilter((prev) =>
@@ -72,7 +72,7 @@ const Table = ({ data, columns, currentPage, pageSize }) => {
               {columns.map((column, colIndex) => (
                 <td key={colIndex}>
                   {column.accessor === "serialNo"
-                    ? currentPage * pageSize + rowIndex + 1 // Calculate serial number based on page
+                    ? currentPage * pageSize + rowIndex + 1 
                     : column.render
                     ? column.render(row)
                     : row[column.accessor]}

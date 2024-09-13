@@ -1,72 +1,223 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { Provider } from 'react-redux';
-import { store } from '../redux/store'; 
-import { BrowserRouter as Router } from 'react-router-dom';
+
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import CategoryPage from '../pages/CategoryPage';
+import { fetchCategories, addCategory, updateCategory, deleteCategory } from "../api/CategoryServices";
+import { act } from 'react-dom/test-utils';
 
-import { fetchCategories, addCategory, updateCategory, deleteCategory } from '../api/CategoryServices';
+jest.mock("../api/CategoryServices");
 
+jest.mock("../components/button", () => ({ name, onClick }) => (
+  <button onClick={onClick}>{name}</button>
+));
+jest.mock("../components/modal", () => ({ children, isOpen, onClose }) => (
+  isOpen ? <div data-testid="modal">{children}<button onClick={onClose}>Close</button></div> : null
+));
+jest.mock("../components/table", () => ({ data }) => (
 
+  <table>
+    <tbody>
+      {data.map((item, index) => (
+        <tr key={index}>
+          <td>{item.name}</td>
+          <td>{item.description}</td>
+          <td className="actionicons">
+            <img src="editicon.png" alt="Edit" className="action-icon" />
+            <img src="deleteicon.png" alt="Delete" className="action-icon" />
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+));
+jest.mock("../components/searchbar", () => ({ searchTerm, onChange }) => (
+  <input type="text" value={searchTerm} onChange={onChange} data-testid="searchbar" />
+));
+jest.mock("../components/toast", () => ({ type, message }) => (
+  <div data-testid={`toast-${type}`}>{message}</div>
+));
 
-import { MemoryRouter } from 'react-router-dom';
-
-
-jest.mock('../api/CategoryServices');
-jest.mock('../components/toast/toast', () => ({
-  __esModule: true,
-  default: ({ message }) => <div>{message}</div>,
-}));
-
-const renderWithRouter = (ui) => render(<MemoryRouter>{ui}</MemoryRouter>);
+jest.mock("../hocs/WithLayoutComponent", () => (Component) => Component);
 
 describe('CategoryPage', () => {
   beforeEach(() => {
-    fetchCategories.mockResolvedValue({ content: [], totalPages: 1 });
-    addCategory.mockResolvedValue({});
-    updateCategory.mockResolvedValue({});
-    deleteCategory.mockResolvedValue({});
+    fetchCategories.mockResolvedValue({
+      data: {
+        content: [
+          { id: 1, name: 'Category 1', description: 'Description 1' },
+        ],
+        totalPages: 1,
+      }
+    });
   });
 
-  test('renders CategoryPage with heading and buttons', () => {
-    renderWithRouter(<CategoryPage />);
-
-    expect(screen.getByText('Category List')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Add Category/i })).toBeInTheDocument();
+  test('renders CategoryPage and fetches categories', async () => {
+    await act(async () => {
+      render(<CategoryPage />);
+    });
+    
+    expect(await screen.findByText('Category List')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Category 1')).toBeInTheDocument();
+    });
   });
 
-  test('opens and closes add category modal', async () => {
-    renderWithRouter(<CategoryPage />);
-
-    fireEvent.click(screen.getByRole('button', { name: /Add Category/i }));
-    expect(screen.getByText('Add Category')).toBeInTheDocument();
-
-    fireEvent.click(screen.getByText('No'));
-    expect(screen.queryByText('Add Category')).not.toBeInTheDocument();
+  test('opens add category modal', async () => {
+    await act(async () => {
+      render(<CategoryPage />);
+    });
+    
+    fireEvent.click(screen.getByText('Add Category'));
+    
+    await waitFor(() => {
+      expect(screen.getByTestId('modal')).toBeInTheDocument();
+    });
+    expect(screen.getByRole('heading', { name: 'Add Category' })).toBeInTheDocument();
   });
 
-  test('shows success toast on adding a category', async () => {
-    renderWithRouter(<CategoryPage />);
+  test('adds a new category', async () => {
+    addCategory.mockResolvedValue({ data: { message: 'Category added successfully' } });
+    
+    await act(async () => {
+      render(<CategoryPage />);
+    });
+    
+    fireEvent.click(screen.getByText('Add Category'));
+    
+    await waitFor(() => {
+      expect(screen.getByTestId('modal')).toBeInTheDocument();
+    });
 
-    fireEvent.click(screen.getByRole('button', { name: /Add Category/i }));
-    // Fill form with valid data and submit
-    // Simulate form submission
-    // Replace the following line with actual form submission logic if needed
-    await waitFor(() => expect(screen.getByText('Category added successfully!')).toBeInTheDocument());
+    const nameInput = screen.getByTestId('modal').querySelector('input[name="name"]');
+    const descriptionInput = screen.getByTestId('modal').querySelector('textarea[name="description"]');
+    const saveButton = screen.getByTestId('modal').querySelector('button');
+
+    fireEvent.change(nameInput, { target: { value: 'New Category' } });
+    fireEvent.change(descriptionInput, { target: { value: 'New Description' } });
+    fireEvent.click(saveButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('toast-success')).toHaveTextContent('Category added successfully');
+    });
   });
 
-  test('shows failure toast on failed category addition', async () => {
-    addCategory.mockRejectedValue(new Error('Failed to add category'));
-    renderWithRouter(<CategoryPage />);
+  test('edits a category', async () => {
+    updateCategory.mockResolvedValue({ data: { message: 'Category updated successfully' } });
+    
+    await act(async () => {
+      render(<CategoryPage />);
+    });
+    
+    await waitFor(() => {
+      const editIcons = screen.getAllByAltText('Edit');
+      expect(editIcons.length).toBeGreaterThan(0);
+    });
 
-    fireEvent.click(screen.getByRole('button', { name: /Add Category/i }));
-    // Simulate form submission
-    await waitFor(() => expect(screen.getByText('Failed to add category')).toBeInTheDocument());
+    const editIcons = screen.getAllByAltText('Edit');
+    fireEvent.click(editIcons[0]);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('modal')).toBeInTheDocument();
+    });
+
+    const nameInput = screen.getByTestId('modal').querySelector('input[name="name"]');
+    const saveButton = screen.getByTestId('modal').querySelector('button');
+
+    fireEvent.change(nameInput, { target: { value: 'Updated Category' } });
+    fireEvent.click(saveButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('toast-success')).toHaveTextContent('Category updated successfully');
+    });
   });
 
-  test('handles page navigation', async () => {
-    renderWithRouter(<CategoryPage />);
+  test('deletes a category', async () => {
+    deleteCategory.mockResolvedValue({ data: { message: 'Category deleted successfully' } });
+    
+    await act(async () => {
+      render(<CategoryPage />);
+    });
+    
+    await waitFor(() => {
+      const deleteIcons = screen.getAllByAltText('Delete');
+      expect(deleteIcons.length).toBeGreaterThan(0);
+    });
 
-    fireEvent.click(screen.getByAltText('next'));
-    // Add assertions based on pagination logic if applicable
+    const deleteIcons = screen.getAllByAltText('Delete');
+    fireEvent.click(deleteIcons[0]);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('modal')).toBeInTheDocument();
+    });
+
+    const yesButton = screen.getByTestId('modal').querySelector('button');
+    expect(yesButton).toHaveTextContent('Yes');
+    fireEvent.click(yesButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('toast-success')).toHaveTextContent('Category deleted successfully');
+    });
+  });
+
+  test('handles API error', async () => {
+    addCategory.mockRejectedValue({ 
+      response: { 
+        data: { message: 'Error adding category' } 
+      } 
+    });
+    
+    await act(async () => {
+      render(<CategoryPage />);
+    });
+    
+    fireEvent.click(screen.getByText('Add Category'));
+    
+    await waitFor(() => {
+      expect(screen.getByTestId('modal')).toBeInTheDocument();
+    });
+
+    const nameInput = screen.getByTestId('modal').querySelector('input[name="name"]');
+    const saveButton = screen.getByTestId('modal').querySelector('button');
+
+    fireEvent.change(nameInput, { target: { value: 'New Category' } });
+    fireEvent.click(saveButton);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('toast-failure')).toHaveTextContent('Error adding category');
+    });
+  });
+
+  test('handles pagination', async () => {
+    fetchCategories.mockResolvedValue({
+      data: {
+        content: [{ id: 1, name: 'Category 1', description: 'Description 1' }],
+        totalPages: 2,
+      }
+    });
+
+    await act(async () => {
+      render(<CategoryPage />);
+    });
+    
+    const nextButton = await screen.findByAltText('next');
+    fireEvent.click(nextButton);
+
+    await waitFor(() => {
+      expect(fetchCategories).toHaveBeenCalledWith(1, 7, '');
+    });
+  });
+
+  test('searches for categories', async () => {
+    await act(async () => {
+      render(<CategoryPage />);
+    });
+    
+    const searchbar = await screen.findByTestId('searchbar');
+    fireEvent.change(searchbar, { target: { value: 'Search Term' } });
+
+    await waitFor(() => {
+      expect(fetchCategories).toHaveBeenCalledWith(0, 7, 'Search Term');
+    });
   });
 });
+

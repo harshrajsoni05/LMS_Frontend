@@ -103,7 +103,6 @@ const LoginForm = () => {
       showSuccessToast('Login Successful!');
     } catch (error) {
       showFailureToast('Invalid Credentials');
-      console.log(error);
     }
   };
 

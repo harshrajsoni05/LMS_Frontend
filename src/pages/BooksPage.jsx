@@ -1,18 +1,15 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-//apis
 import {
   fetchBooks,
   addBook,
   updateBook,
   deleteBook,
-  fetchAllBooks,
 } from "../api/BookServices";
 import { fetchAllCategories } from "../api/CategoryServices";
 import { addIssuance } from "../api/IssuanceServices";
 
-//components
 import CustomButton from "../components/button";
 import CustomModal from "../components/modal";
 import Table from "../components/table";
@@ -23,8 +20,8 @@ import Toast from "../components/toast";
 import IssuanceForm from "../components/issuanceform";
 import { modalSizes } from "../components/utils";
 import HOC from "../hocs/WithLayoutComponent";
+import Loader from "../components/loader";
 
-//images
 import EditIcon from "../assets/images/editicon.png";
 import DeleteIcon from "../assets/images/deleteicon.png";
 import historyicon from "../assets/images/historyicon.png";
@@ -35,7 +32,8 @@ import AssignUser from "../assets/images/alloticon.png";
 function BooksPage() {
   const navigate = useNavigate();
 
-  
+  const [loading,setloading]= useState(false);
+
   const [books, setBooks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -76,6 +74,8 @@ function BooksPage() {
   };
 
   const getBooks = async () => {
+    setloading(true)
+
     const trimmedSearchTerm = searchTerm.trim();
   
     if (trimmedSearchTerm.length >= 3 || trimmedSearchTerm.length === 0) {
@@ -85,9 +85,14 @@ function BooksPage() {
         setTotalPages(data.totalPages || 0);
       } catch (error) {
         showFailureToast("Can't Fetch Books");
+      } finally {
+        setloading(false)
       }
     } else if (trimmedSearchTerm.length < 3 && trimmedSearchTerm.length > 0) {
+      setloading(false)
+
     } else {
+      setloading(false)
       fetchBooks([]);
       setTotalPages(0);
     }
@@ -112,6 +117,7 @@ function BooksPage() {
 
   const handleAddBook = async (newBook) => {
     try {
+      setloading(true)
       const bookToCreate = {
         title: newBook.title.trim(),
         author: newBook.author.trim(),
@@ -126,11 +132,15 @@ function BooksPage() {
     } catch (error) {
       showFailureToast(error.response.data.message);
       handleCloseModal();
+    } finally{
+      setloading(false)
     }
   };
 
   const handleEditBook = async (updatedBook) => {
     try {
+      setloading(true)
+
       const bookToUpdate = {
         id: currentData.id,
         title: updatedBook.title.trim(),
@@ -145,12 +155,16 @@ function BooksPage() {
       showSuccessToast(response.message);
     } catch (error) {
       showFailureToast(error.response.data.message);
+    } finally{
+      setloading(false)
     }
   };
 
   const handleDelete = async (rowData) => {
     const id = rowData.id;
     try {
+      setloading(true)
+
       const response = await deleteBook(id);
       setBooks(books.filter((book) => book.id !== id));
       showSuccessToast(response.message);
@@ -158,11 +172,15 @@ function BooksPage() {
     } catch (error) {
       showFailureToast(error.response.data.message);
       handleCloseModal();
+    } finally{
+      setloading(false)
     }
   };
 
   const handleIssuanceSubmit = async (issuanceDetails) => {
     try {
+      setloading(true)
+
       const response = await addIssuance(issuanceDetails);
       getBooks();
       
@@ -170,6 +188,8 @@ function BooksPage() {
       return response.data
     } catch (error) {
       showFailureToast(error.response.data.message);
+    } finally{
+      setloading(false)
     }
   };
 
@@ -292,14 +312,16 @@ function BooksPage() {
             className="add"
           />
         </div>
+        {loading ? (<Loader /> ) : (
 
         <div className="table-container">
           {books.length === 0 ? (
-            <p>No data found</p>
+            <p>No Books found</p>
           ) : (
             <Table data={books} columns={columns} />
           )}
         </div>
+        )}
 
         <div className="pagination-controls">
           <img

@@ -6,8 +6,10 @@ import { SearchByNumber as findUserByMobile } from "../api/UserServices";
 import "../styles/Issuanceform.css";
 import CustomButton from "./button";
 import { formatDateTime } from "./utils";
+import { useNavigate } from "react-router-dom";
 
 const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
+  const navigate = useNavigate()
 
   const [bookTitle, setBookTitle] = useState(selectedBook?.title || "");
   const [book_id, setBookId] = useState(selectedBook?.id || null);
@@ -70,7 +72,6 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
         setErrorMessage("User not found. Please register first.");
       }
     } catch (error) {
-      console.error("Failed to fetch user details:", error);
       setUserId(null);
       setErrorMessage("User not found. Please register first.");
     }
@@ -87,7 +88,7 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
     }
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async(event) => {
     event.preventDefault();
 
     if (!book_id || !user_id) {
@@ -112,8 +113,17 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
       issuance_type,
     };
 
-    onSubmit(issuanceDetails);
-    onClose();
+    try {
+      await onSubmit(issuanceDetails); 
+      onClose();
+
+      setTimeout(() => {
+        navigate("/issuance");  
+      }, 1000);
+      
+    } catch (error) {
+      console.error("Failed to create issuance:", error);
+    }
   };
 
   const now = new Date().toISOString().slice(0, 16);

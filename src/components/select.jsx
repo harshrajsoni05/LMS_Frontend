@@ -1,6 +1,5 @@
-// src/components/Select.jsx
 import React, { useState } from 'react';
-import '../styles/Select.css'; // Import CSS file for styling
+import '../styles/Select.css'; 
 
 const Select = ({ options, value, onChange, placeholder }) => {
   const [isOpen, setIsOpen] = useState(false);

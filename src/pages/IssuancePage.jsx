@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import "../styles/CategoryPage.css";
-
 import {
   fetchIssuances,
   updateIssuance,
   deleteIssuance,
 } from "../api/IssuanceServices";
 
+//components
 import CustomModal from "../components/modal";
 import Table from "../components/table";
 import SearchBar from "../components/searchbar";
@@ -14,15 +14,20 @@ import WithLayoutComponent from "../hocs/WithLayoutComponent";
 import Dynamicform from "../components/dynamicform";
 import Tooltip from "../components/toolTip";
 import Toast from "../components/toast";
+import Loader from "../components/loader";
+import CustomButton from "../components/button";
 
+
+//images
 import back from "../assets/images/go-back.png";
 import next from "../assets/images/go-next.png";
 import EditIcon from "../assets/images/editicon.png";
 import DeleteIcon from "../assets/images/deleteicon.png";
-import CustomButton from "../components/button";
+import { getCurrentDateTime } from "../components/utils";
 
 function IssuancesPage() {
   const [issuances, setIssuances] = useState([]);
+  const [loading, setloading] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState("");
@@ -50,6 +55,7 @@ function IssuancesPage() {
   };
 
   const getIssuances = async () => {
+    setloading(true)
     const trimmedSearchTerm = searchTerm.trim();
 
     if (trimmedSearchTerm.length >= 3 || trimmedSearchTerm.length === 0) {
@@ -63,10 +69,14 @@ function IssuancesPage() {
         setTotalPages(data.totalPages || 0);
       } catch (error) {
         console.error("Error fetching issuances:", error);
+      } finally{
+        setloading(false)
       }
     } else if (trimmedSearchTerm.length > 0 && trimmedSearchTerm.length < 3) {
-      console.warn("Search term must be at least 3 characters.");
+      setloading(false)
+
     } else {
+      setloading(false)
       setIssuances([]);
       setTotalPages(0);
     }
@@ -77,6 +87,7 @@ function IssuancesPage() {
   }, [currentPage, searchTerm]);
 
   const handleEditIssuance = async (updatedIssuance) => {
+    setloading(true)
     try {
       const issuanceToUpdate = {
         id: currentData.id,
@@ -89,13 +100,15 @@ function IssuancesPage() {
       };
 
       const response = await updateIssuance(currentData.id, issuanceToUpdate);
-      console.log("Issuance to update:", issuanceToUpdate); // Add this line to debug
 
       getIssuances();
       handleCloseModal();
       showSuccessToast(response.message)
     } catch (error) {
       showFailureToast(error.response.data.message);
+    } finally{
+      setloading(false)
+
     }
   };
 
@@ -108,7 +121,11 @@ function IssuancesPage() {
       showSuccessToast(response.message);
     } catch (error) {
       showFailureToast(error.response.data.message);
+    } finally{
+      setloading(false)
+
     }
+
   };
 
   const handleSearchChange = (e) => {
@@ -140,7 +157,6 @@ function IssuancesPage() {
   const handleSubmitModal = (data) => {
     if (modalType === "edit") {
       handleEditIssuance(data);
-      console.log('data->>>>>>>>>>>>>',data)
     }
   };
 
@@ -152,10 +168,7 @@ function IssuancesPage() {
     {
       header: "Issue Date",
       render: (rowData) => {
-        return (
-          rowData.issue_date.split("T")[0] +
-          " " +
-          rowData.issue_date.split("T")[1].split(".")[0].slice(0, -3));
+        return (rowData.issue_date.split("T")[0] +" " +rowData.issue_date.split("T")[1].split(".")[0].slice(0, -3));
       },
     },
     {
@@ -167,7 +180,7 @@ function IssuancesPage() {
       header: "Return Date",
       render: (rowData) => {
         if (!rowData.return_date) {
-          return "Pending";
+          return "--";
         }
         if (rowData.issuance_type === "In House") {
           return (
@@ -195,12 +208,16 @@ function IssuancesPage() {
         <img
           src={EditIcon}
           alt="Edit"
-          style={{ paddingLeft: "0" }}
+          style={{
+            paddingLeft: "0",
+            pointerEvents: rowData.status === "Returned" ? "none" : "auto",  
+            opacity: rowData.status === "Returned" ? 0.5 : 1,  
+          }}
           className="action-icon"
           onClick={() => handleOpenModal("edit", rowData)}
         />
       </Tooltip>
-
+  
       <Tooltip message="Delete">
         <img
           src={DeleteIcon}
@@ -211,6 +228,7 @@ function IssuancesPage() {
       </Tooltip>
     </div>
   );
+  
 
   return (
     <>
@@ -224,6 +242,7 @@ function IssuancesPage() {
           />
         </div>
 
+        {loading ? (<Loader/>) : (
         <div className="table-container">
           {issuances.length === 0 ? (
             <p>No Issuances found</p>
@@ -236,6 +255,7 @@ function IssuancesPage() {
             />
           )}
         </div>
+        )}
 
         <div className="pagination-controls">
           <img
@@ -277,7 +297,6 @@ function IssuancesPage() {
                options: [
                  { value: "Issued", label: "Issued" },
                  { value: "Returned", label: "Returned" },
-                 // Add other options if needed
                ],
              },
              {
@@ -286,8 +305,8 @@ function IssuancesPage() {
                type: "datetime-local",
                placeholder: "Return Date",
                required: false,
-               defaultValue: currentData.return_date,
-             },
+               defaultValue: currentData.return_date || getCurrentDateTime(),
+              },
            ]}
             onSubmit={handleSubmitModal}
             onCancel={handleCloseModal}

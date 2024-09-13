@@ -1,5 +1,7 @@
+import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import CustomButton from "./button";
+import Modal from "../components/modal";
 import "../styles/Sidebar.css";
 import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../redux/authActions";
@@ -8,20 +10,32 @@ import category from "../assets/images/category.png";
 import listcheck from "../assets/images/listcheck.png";
 import useradd from "../assets/images/useradd.png";
 import dash from "../assets/images/dash.png";
-import historyIcon from "../assets/images/history.png";  
+import historyIcon from "../assets/images/history.png";
 
 const Sidebar = () => {
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const role = useSelector((state) => state.auth.role);
 
   const handleLogout = () => {
-    window.localStorage.removeItem('jwtToken');
+    window.localStorage.removeItem("jwtToken");
     dispatch(logoutUser());
-    navigate('/');
-  }
+    navigate("/");
+  };
+
+  const openLogoutModal = () => {
+    setIsModalOpen(true);
+  };
+
+  const closeLogoutModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const confirmLogout = () => {
+    handleLogout();
+    closeLogoutModal();
+  };
 
   return (
     <div className="container">
@@ -35,7 +49,6 @@ const Sidebar = () => {
                   Dashboard
                 </NavLink>
               </li>
-
               <li className="menu-item">
                 <NavLink to="/category" className={({ isActive }) => (isActive ? "active" : "")}>
                   <img src={category} alt="Category" />
@@ -48,7 +61,6 @@ const Sidebar = () => {
                   Books
                 </NavLink>
               </li>
-              
               <li className="menu-item">
                 <NavLink to="/user" className={({ isActive }) => (isActive ? "active" : "")}>
                   <img src={useradd} alt="Users" />
@@ -63,7 +75,7 @@ const Sidebar = () => {
               </li>
             </>
           )}
-            {role === "ROLE_USER" && (
+          {role === "ROLE_USER" && (
             <>
               <li className="menu-item">
                 <NavLink to="/userhistory" className={({ isActive }) => (isActive ? "active" : "")}>
@@ -78,10 +90,19 @@ const Sidebar = () => {
           <CustomButton
             name={"Logout"}
             className={"logout-btn"}
-            onClick={handleLogout}
+            onClick={openLogoutModal} 
           />
         </div>
       </div>
+
+      <Modal isOpen={isModalOpen} onClose={closeLogoutModal} height="200px" width="300px">
+        <h2>Confirm Logout</h2>
+        <p>Are you sure you want to logout?</p>
+        <div className="modal-actions">
+          <CustomButton onClick={confirmLogout} name={"Yes"} className={"confirm"}></CustomButton>
+          <CustomButton onClick={closeLogoutModal} name={"No"}>No</CustomButton>
+        </div>
+      </Modal>
     </div>
   );
 };

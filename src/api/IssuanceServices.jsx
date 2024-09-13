@@ -1,5 +1,8 @@
 import {  put, post, del, getPage, axiosInstance } from "./ApiManager";
 import { ISSUANCES_API_URL } from "../constants/apiConstants";
+import { useNavigate } from "react-router-dom";
+
+
 
 const fetchIssuances = async (page, pageSize, search) => {
   return await getPage(ISSUANCES_API_URL, page, pageSize, search);
@@ -7,6 +10,7 @@ const fetchIssuances = async (page, pageSize, search) => {
 
 const addIssuance = async (issuanceData) => {
   return await post(ISSUANCES_API_URL, issuanceData);
+
 };
 
 const updateIssuance = async (id, issuanceData) => {

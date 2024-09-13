@@ -63,11 +63,12 @@ function UsersPage() {
   const navigate = useNavigate();
 
   const getUsers = async () => {
+    setLoading(true);
+
     const trimmedSearchTerm = searchTerm.trim();
 
     if (trimmedSearchTerm.length >= 3 || trimmedSearchTerm.length === 0) {
       try {
-        setLoading(true);
 
         const data = await fetchUsers(currentPage, pageSize, trimmedSearchTerm);
         setUsers(data.content || []);
@@ -78,7 +79,9 @@ function UsersPage() {
         setLoading(false);
       }
     } else if (trimmedSearchTerm.length > 0 && trimmedSearchTerm.length < 3) {
+      setLoading(false);
     } else {
+      setLoading(false);
       setUsers([]);
       setTotalPages(0);
     }
@@ -103,6 +106,7 @@ function UsersPage() {
   }, [currentPage, searchTerm]);
 
   const handleEditUser = async (updatedUser) => {
+    setLoading(true)
     try {
       const userToUpdate = {
         id: currentData.id,
@@ -126,11 +130,15 @@ function UsersPage() {
     } catch (error) {
       console.error("Failed to update user:", error);
       showFailureToast(error.response.data.message);
+    } finally{
+      setLoading(false)
+
     }
   };
 
   const handleDelete = async (id) => {
     try {
+      setLoading(true)
       const response = await deleteUser(id);
       setUsers(users.filter((user) => user.id !== id));
       handleCloseModal();
@@ -138,16 +146,23 @@ function UsersPage() {
     } catch (error) {
       showFailureToast(error.response.data.message);
       handleCloseModal();
+    } finally{
+      setLoading(false)
+
     }
   };
 
   const handleIssueBook = async (issuanceDetails) => {
     try {
+      setLoading(true)
       const response = await addIssuance(issuanceDetails);
       handleCloseModal();
       showSuccessToast(response.message);
     } catch (error) {
       showFailureToast(error.response.data.message);
+    } finally{
+      setLoading(false)
+
     }
   };
 
@@ -266,10 +281,8 @@ function UsersPage() {
             onClick={() => handleOpenModal("register")}
             className="add"
           />
-        </div>
-        
-        <Loader loading={loading}/>
-        
+        </div>      
+          {loading ? (<Loader/> ): (
           <div className="table-container">
             {users.length === 0 ? (
               <p>No Users found</p>
@@ -282,7 +295,7 @@ function UsersPage() {
               />
             )}
           </div>
-        
+        )}  
 
         <div className="pagination-controls">
           <img
@@ -347,7 +360,7 @@ function UsersPage() {
                 label: "Number",
                 name: "number",
                 type: "number",
-                placeholder: "Number",
+                placeholder: "Enter Phone Number",
                 defaultValue: currentData.number,
                 required: true,
 

@@ -11,7 +11,7 @@ export const validatePassword = (password) => {
 };
 
 export const validateEmail = (email) => {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.(com|org|net|co|edu|gov|info)$/i;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.(com|in|org)$/i;
     return emailPattern.test(email);
 }
 
@@ -35,6 +35,17 @@ export const formatDateTime = (date) => {
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
 };
 
+export const getCurrentDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); 
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+  };
+  
   
 
 export const modalSizes = {

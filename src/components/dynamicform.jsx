@@ -24,14 +24,14 @@ const Dynamicform = ({ fields, onSubmit, heading, defaultValues }) => {
   const handleInputChange = (e) => {
     const { name, value, type } = e.target;
 
-    
     if (type === 'number') {
       if (value.includes('.') || value < 0) {
         setErrors({ ...errors, [name]: "Only positive integers are allowed" });
         return;
       }
-      
     }
+    
+
     setFormData({ ...formData, [name]: value });
     setErrors({ ...errors, [name]: '' });
   };
@@ -51,17 +51,24 @@ const Dynamicform = ({ fields, onSubmit, heading, defaultValues }) => {
       if ((field.type === 'time' || field.type === 'datetime-local') && !value) {
         newErrors[field.name] = `${field.placeholder} cannot be empty`;
       }
-      
+
       if (field.name === 'email' && value && !validateEmail(value)) {
         newErrors[field.name] = `Enter a valid Email Address`;
       }
+
       if (field.placeholder === 'Enter Phone Number' && value) {
         if (!validateMobile(value)) {
           newErrors[field.name] = `Phone number must be a valid 10 digits`;
         }
       }
 
-    });
+       if (field.placeholder === 'Category Name' || field.placeholder === 'Book Title') {
+      if (value && !/^[a-zA-Z0-9\s'.,-]*$/.test(value)) {
+        newErrors[field.name] = `Enter a valid ${field.placeholder}`;
+      }
+    }
+  });
+    
 
     if (formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
@@ -74,8 +81,7 @@ const Dynamicform = ({ fields, onSubmit, heading, defaultValues }) => {
 
     onSubmit(formData);
     setFormData({});
-};
-
+  };
 
   return (
     <div>
@@ -119,7 +125,6 @@ const Dynamicform = ({ fields, onSubmit, heading, defaultValues }) => {
                   value={formData[field.name] || ""}
                   onChange={handleInputChange}
                   min={field.type === 'datetime-local' ? getCurrentDateTime() : undefined}
-
                 />
               )}
 

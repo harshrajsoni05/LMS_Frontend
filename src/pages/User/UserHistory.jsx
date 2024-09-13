@@ -45,42 +45,37 @@ function UserHistoryPage( ) {
     { header: "Book", render: (rowData) => rowData?.books?.title || "N/A" },
 
     { header: "User", render: (rowData) => rowData?.users?.name || "N/A" },
-    { header: "Status", accessor: "status" },
+    
+    {
+      header: "Issue Date",
+      render: (rowData) => {
+        return (rowData.issue_date.split("T")[0] +" " +rowData.issue_date.split("T")[1].split(".")[0].slice(0, -3));
+      },
+    },
     {
       header: "Issuance Type", 
       render: (rowData) => rowData.issuance_type === "In House" ? "Takeaway" : "In House",
     },
     {
-      header: "Issue Date",
-      render: (rowData) => {
-        if (rowData.issuance_type === "Library") {
-          const issueTime = new Date(rowData.issue_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          return issueTime;
-        }
-        const issueDate = new Date(rowData.issue_date).toLocaleDateString(undefined, {
-          year: 'numeric', month: 'long', day: 'numeric',
-        });
-        return issueDate;
-      },
-    },
-    {
       header: "Return Date",
       render: (rowData) => {
         if (!rowData.return_date) {
-          return "Pending";
+          return "--";
         }
         if (rowData.issuance_type === "In House") {
-          const returnDate = new Date(rowData.return_date).toLocaleDateString(undefined, {
-            year: 'numeric', month: 'long', day: 'numeric',
-          });
-          return returnDate;
+          return (
+            rowData.return_date.split("T")[0] +
+            "  " +
+            rowData.return_date.split("T")[1].split(".")[0].slice(0, -3)
+          );
         } else if (rowData.issuance_type === "Library") {
-          const returnTime = new Date(rowData.return_date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          return returnTime;
+          return rowData.return_date.split("T")[1].split(".")[0].slice(0, -3)
         }
         return "N/A";
       },
     },
+    { header: "Status", accessor: "status" },
+
   ];
 
   return (
