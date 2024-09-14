@@ -5,7 +5,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  height: 82.75vh;
+  height: 83.5vh;
 }
 
 .menu-list {
@@ -73,11 +73,16 @@
 .logout-btn:hover {
   transform: scale(1.1);
 }
-
-
-@media (max-width: 1300px) {
+@media (max-width: 768px) {
   .sidebar-menu {
-    height: 85.5vh;
+    height: 50%;
+  }
+
+  
+}
+@media (max-width: 1024px) {
+  .sidebar-menu {
+    height: 90vh;
     padding: 15px;
   }
 
@@ -107,8 +112,9 @@
   }
 
   .logout-btn {
-    font-size: 0.9rem;
-    padding: 0.5rem;
-    margin-left: 0.5rem;
+    display:none;
   }
+  
+
+  
 }

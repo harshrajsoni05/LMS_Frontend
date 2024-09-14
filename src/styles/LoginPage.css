@@ -11,6 +11,7 @@
 .login-page {
     background-color: #839bc5;
     display: flex;
+    flex-direction: row;
     width: 55vw;
     border-radius: 20px;
     color: #6583b7;
@@ -85,29 +86,58 @@
     color: #6583b7;
 }
 
-@media (max-width: 768px) {
+@media(max-width: 1024px){
    
+    .login-page {
+        width: 60vw;
+    }
+    .login-form {
+        width:80%;
+        padding: 1rem 0;
+        margin:0;
+        padding-top:1rem;
+    }
+    .login-right {
+        width: 50%;
+        padding: 20px 0;
+        flex: none;
+    }
+}
+@media (max-width: 768px) {
+    .login-page {
+        flex-direction: column-reverse;
+        width: 50vw;
+    }
 
     .login-left {
-        width: 50%;
-        padding: 20px;
+        width: 100%;
+        padding: 15px 0;
+        flex: none;
     }
 
     .login-right {
         width: 100%;
-        padding: 20px;
+        padding: 20px 0;
+        flex: none;
     }
 
     .login-form {
-        width: 100%;
-        padding: 1rem;
+        width:80%;
+        padding: 1rem 0;
+        margin:0;
+        padding-top:1rem;
     }
 
     .login-content h2 {
-        font-size: 0.5rem;
+        font-size: 0.9rem;
     }
 
     .login-content p {
+        font-size: 0.8rem;
+    }
+
+    .login-form input {
         font-size: 0.9rem;
     }
 }
+

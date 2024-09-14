@@ -96,7 +96,7 @@ const Sidebar = () => {
       </div>
 
       <Modal isOpen={isModalOpen} onClose={closeLogoutModal} height="200px" width="300px">
-        <h2>Confirm Logout</h2>
+        <h3>Confirm Logout</h3>
         <p>Are you sure you want to logout?</p>
         <div className="modal-actions">
           <CustomButton onClick={confirmLogout} name={"Yes"} className={"confirm"}></CustomButton>

@@ -29,7 +29,14 @@ const CategoryPage = ()=> {
   const [pageSize] = useState(7);
   const [totalPages, setTotalPages] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
-
+  const [columns] = useState([
+    { header: "Name", accessor: "name" },
+    { header: "Description", accessor: "description" },
+    {
+      header: "Actions",
+      render: (rowData) => renderActions(rowData),
+    },
+  ]);
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState('success');
   const [toastMessage, setToastMessage] = useState('');
@@ -183,14 +190,7 @@ const CategoryPage = ()=> {
     } 
   };
 
-  const columns = [
-    { header: "Name", accessor: "name" },
-    { header: "Description", accessor: "description" },
-    {
-      header: "Actions",
-      render: (rowData) => renderActions(rowData),
-    },
-  ];
+
 
   const renderActions = (rowData) => (
     <div className="actionicons">
