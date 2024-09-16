@@ -1,0 +1,162 @@
+
+.dashboard {
+  display: grid;
+  grid-template-columns:24% 24% 24% 24%;
+  padding:2% 6% 0 6%;
+  justify-content: space-around;
+}
+
+.dashboard-card {
+  background-color: #c6d8ea;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 2.5rem;
+  width: 8rem;
+  height: 8.5rem;
+  transition: transform 0.3s ease;
+  text-align: center;
+}
+
+.dashboard-card:hover {
+  transform: scale(1.05);
+}
+
+.dashboard-card h2 {
+  margin: 0 0 10px;
+  font-size: 1.25rem;
+  color: #506892;
+}
+
+.dashboard-card p {
+  font-size: 1.4rem;
+  margin: 0;
+  color: #000000; /* Darker text color */
+  font-weight: bold;
+}
+
+.dashboard-card img {
+  width: 3.5rem;
+}
+
+.latest-books {
+  background-color: #f8f9fa; 
+}
+
+.latest-books h2 {
+  color: #506892; 
+}
+
+.latest-books-container {
+  display: grid;
+  grid-template-columns:20% 20% 20% 20% 20%;
+  padding: 0% 5%;  
+}
+
+.book-card {
+  background-color: #e6ecf5; /* White background for the cards */
+  border-radius: 8px;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  padding: 0.4rem;
+  width: 10rem; /* Adjust width as needed */
+  text-align: center;
+  border-color: #c6d8ea;
+  transition: transform 0.3s ease;
+  border-style: solid;
+  border-width: 4px;
+}
+
+.book-card:hover {
+  transform: scale(1.02);
+}
+
+.book-image {
+  width: 8rem;
+  height: 11rem;
+  border-radius: 4px;
+}
+
+.book-title {
+  font-size: 0.8rem;
+  color: #506892;
+}
+
+.book-author {
+  font-size: 0.65rem;
+  color: #000;
+}
+
+.dropdown-menu button:hover {
+  background-color: #e0e0e0;
+}
+
+.recent-books-heading p {
+  font-size: 1.2rem;
+  color: #506892;
+  font-weight:600;
+}
+.recent-books-heading{
+  text-align:center;
+  margin-top:3%;
+}
+
+@media (max-width: 768px) {
+
+  .dashboard-card {
+    padding: 1.5rem;
+    margin: 1rem;
+    height: auto; 
+    width: 100%; 
+  }
+
+
+  .latest-books-container {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
+
+  .dashboard {
+    grid-template-columns: repeat(2, 1fr); 
+    justify-content: center; 
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+  }
+
+  .dashboard-card {
+    padding: 1rem;
+    height: auto; 
+    width: auto; 
+  }
+
+  .dashboard-card h2 {
+    font-size: 1rem;
+  }
+
+  .dashboard-card p {
+    font-size: 1.1rem;
+  }
+
+
+  
+  .book-card {
+    width: 80%;
+    height:auto;
+  }
+
+  .book-image {
+    width: 50%; 
+    height: auto; 
+  }
+
+  .book-title {
+    font-size: 0.7rem;
+  }
+
+  .book-author {
+    font-size: 0.6rem;
+  }
+
+  .recent-books-heading p {
+    font-size: 0.9rem;
+  }
+}

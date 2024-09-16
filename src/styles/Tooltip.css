@@ -1,0 +1,26 @@
+.tooltip-container {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+  }
+  
+  .tooltip-text {
+    visibility: hidden;
+    font-size:0.9rem;
+    background-color: #a1bedc;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 0.25rem ;
+    position: absolute;
+    z-index: 1;
+    bottom: 100%; /* Position above the icon */
+    margin-left: -3rem; /* Center align */
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  
+  .tooltip-container:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }

@@ -1,0 +1,86 @@
+.login-form {
+  text-align: center;
+  font-size:1rem;
+  margin: 0 auto; 
+}
+
+::placeholder {
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+  font-size: 0.75rem;
+}
+
+.login-form h2 {
+  font-size: 1.4rem;
+  margin-bottom: 20px;
+  color: #6583b7;
+}
+
+.input-group {
+  text-align: center;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+}
+
+.input-group input {
+  width: 80%;
+  padding: 10px;
+  margin: 0.35rem auto 0 0 ;
+  background-color: #effafc;
+  border: 1px solid #ccc;
+  border-radius: 30px;
+  font-size: 0.8rem;
+  color: #333; 
+}
+
+.login-btn {
+  font-weight: bold;
+  font-size: 1rem;
+  text-align: center;
+  text-transform: uppercase;
+  padding: 10px 30px;
+  margin: 20px auto;
+  background-color: #6583b7;
+  border-radius: 30px;
+  cursor: pointer;
+  border: none;
+  color: #fff;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.login-btn:hover {
+  background-color: #506da1;
+  transform: scale(1.05);
+}
+
+.login-form p {
+  margin-top: 10px;
+  font-size: 0.8rem;
+  font-weight: 500;
+
+}
+
+.role-selection input[type="radio"] {
+  display: none;
+}
+
+
+
+.input-group .error {
+  border-color: red;
+}
+
+.error-text {
+  color: #af4c4c;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+.login-btn[disabled] {
+  background-color: grey;
+  cursor: not-allowed;
+}

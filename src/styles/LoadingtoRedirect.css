@@ -1,0 +1,17 @@
+.redirect-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+}
+
+.redirect-page div {
+    padding: 1rem;
+}
+
+.redirect-page div p {
+    color: var(--color-alert-error);
+    
+}
+

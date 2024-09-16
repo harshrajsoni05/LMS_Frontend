@@ -1,0 +1,45 @@
+.modal-form-input {
+  display: flex;
+  flex-direction: column;
+}
+.modal-form-input label {
+  display: block;
+  margin-bottom: 5px;
+  font-size:0.8rem;
+  font-weight: bold;
+}
+
+.modal-form-input input,
+.modal-form-input select,
+.modal-form-input textarea {
+  padding: 10px;
+  font-family: "Poppins", sans-serif;
+  border: 2px solid #6583b7;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  transition: border 0.3s ease;
+  margin-bottom:10px;  
+
+}
+
+.modal-form-input textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.error-message {
+  color: red;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.modal-form-btn-div{
+  padding-left:0;
+  margin-top:1rem;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
