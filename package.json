@@ -22,11 +22,35 @@
     "test": "react-scripts test --transformIgnorePatterns 'node_modules/(?!axios)/' --env=jsdom",
     "eject": "react-scripts eject",
     "coverage" : "react-scripts test --transformIgnorePatterns 'node_modules/(?!axios)/' --env=jsdom --watchAll=false --coverage"
-
-
-
-
   },
+
+  "jest": {
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/src/hocs",
+      "/src/pages/User",
+      "/src/redux",
+      "/src/components",
+      "/src/constants",
+      "/src/pages/BooksPage.jsx",
+      "/src/pages/History.jsx",
+      "/src/pages/IssuancePage.jsx",
+      "/src/pages/LoginPage.jsx",
+      "/src/pages/UserPage.jsx",
+      "/src/api/ApiManager.jsx",
+      "/src/api/Auth.jsx",
+      "/src/api/BookServices.jsx",
+      "/src/api/DashboardServices.jsx",
+      "/src/api/IssuanceServices.jsx",
+      "/src/api/UserServices.jsx",
+      "/src/App.js",
+      "/src/index.js",
+      "/src/reportWebVitals.js",
+      "/src/test-utils.js"
+
+    ]
+  },
+
   "eslintConfig": {
     "extends": [
       "react-app",
