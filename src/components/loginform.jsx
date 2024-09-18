@@ -51,7 +51,7 @@ const LoginForm = () => {
         navigate('/userhistory');
       }
     }
-  }, [auth, navigate]);
+  }, [auth]);
 
   const validateLogin = () => {
     let isValid = true;

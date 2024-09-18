@@ -111,6 +111,12 @@
   /* background-color: #d3d3d3; */
 }
 
+.success-message {
+  color: green;
+  font-size: 0.9rem;
+}
+
+
 @media (max-width: 768px) {
   .form-group {
     gap: 5px;
