@@ -1,5 +1,3 @@
-
-
 import { useState } from "react";
 import { findBookSuggestions } from "../api/BookServices";
 import { SearchByNumber as findUserByMobile } from "../api/UserServices";
@@ -9,13 +7,14 @@ import { formatDateTime } from "./utils";
 import { useNavigate } from "react-router-dom";
 
 const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const [bookTitle, setBookTitle] = useState(selectedBook?.title || "");
   const [book_id, setBookId] = useState(selectedBook?.id || null);
 
   const [userMobileNumber, setUserMobileNumber] = useState(selectedUser?.mobile || "");
   const [user_id, setUserId] = useState(selectedUser?.id || null);
+  const [userName, setUserName] = useState(""); // New state for user name
   
   const [issuance_type, setIssuanceType] = useState("In House");
   const [expectedReturn, setExpectedReturn] = useState("");
@@ -66,13 +65,16 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
       if (userDetails.content && userDetails.content.length > 0) {
         const user = userDetails.content[0];
         setUserId(user.id);
+        setUserName(user.name); 
         setErrorMessage("");
       } else {
         setUserId(null);
+        setUserName(""); 
         setErrorMessage("User not found. Please register first.");
       }
     } catch (error) {
       setUserId(null);
+      setUserName(""); 
       setErrorMessage("User not found. Please register first.");
     }
   };
@@ -84,11 +86,12 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
       fetchUserDetails(mobileNumber);
     } else {
       setUserId(null);
+      setUserName(""); 
       setErrorMessage("");
     }
   };
 
-  const handleSubmit = async(event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     if (!book_id || !user_id) {
@@ -114,25 +117,28 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
     };
 
     try {
-      await onSubmit(issuanceDetails); 
+      await onSubmit(issuanceDetails);
       onClose();
 
       setTimeout(() => {
-        navigate("/issuance");  
+        navigate("/issuance");
       }, 1000);
-      
+
     } catch (error) {
       console.error("Failed to create issuance:", error);
     }
   };
 
   const now = new Date().toISOString().slice(0, 16);
-
+  
   return (
     <div className="issuance-form">
       <h2>Issue Book</h2>
       <form onSubmit={handleSubmit}>
         {errorMessage && <p className="error-message">{errorMessage}</p>}
+        {userName && (
+                <p className="success-message">Found user with name -  {userName}</p>
+              )}
         {selectedBook ? (
           <>
             <div className="form-group">
@@ -143,6 +149,7 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
                 onChange={handleMobileNumberChange}
                 placeholder="Enter User Mobile Number"
               />
+              
             </div>
           </>
         ) : (
@@ -159,10 +166,10 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
                 <ul className="dropdown-suggestions">
                   {bookSuggestions.map((book) => (
                     <li key={book.id} onClick={() => {
-                      if(book.quantity>0){
-                        handleSuggestionClick(book)
+                      if (book.quantity > 0) {
+                        handleSuggestionClick(book);
                       }
-                      }} className={book.quantity === 0?'disabled':''}>
+                    }} className={book.quantity === 0 ? 'disabled' : ''}>
                       {book.title}
                     </li>
                   ))}
