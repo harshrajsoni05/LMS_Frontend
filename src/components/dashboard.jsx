@@ -13,7 +13,6 @@ import Loader from "./loader";
 const LatestBooks = ({ books }) => {
   return (
     <div className="latest-books-container">
-
       {books.map((book) => (
         <div key={book.id} className="book-card">
           <img src={book.imageURL} alt={book.title} className="book-image" />
@@ -34,29 +33,29 @@ const Dashboard = () => {
   });
 
   const [latestBooks, setLatestBooks] = useState([]);
-  const [loading,setloading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-   useEffect(() => {
-    setloading(true)
+  useEffect(() => {
     const fetchData = async () => {
-      try {
-        const [dashboardData, recentBooks] = await Promise.all([
-          fetchDashboardCounts(),
-          fetchRecentBooks()
-        ]);
+      setLoading(true);
 
+      try {
+        const dashboardData = await fetchDashboardCounts();
         setData({
           booksCount: dashboardData.booksCount,
           categoriesCount: dashboardData.categoriesCount,
           issuancesCount: dashboardData.issuancesCount,
-          usersCount: (dashboardData.usersCount - 1),
+          usersCount: dashboardData.usersCount - 1,
         });
 
+        const recentBooks = await fetchRecentBooks();
         setLatestBooks(recentBooks);
-      } catch (error) {
+      } 
+      
+        catch (error) {
         console.error("Error fetching dashboard data", error);
       } finally {
-        setloading(false)
+        setLoading(false);
       }
     };
 
@@ -66,7 +65,7 @@ const Dashboard = () => {
   return (
     <div className="container-dashboard">
       {loading ? (
-        <Loader /> 
+        <Loader />
       ) : (
         <>
           <div className="dashboard">
@@ -100,6 +99,5 @@ const Dashboard = () => {
     </div>
   );
 };
-    
 
-export const DashboardwithLayout = withLayout(Dashboard);
+export const DashboardWithLayout = withLayout(Dashboard);
