@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { fetchCategories, addCategory, updateCategory, deleteCategory } from "../../api/CategoryServices"; 
+import {
+  fetchCategories,
+  addCategory,
+  updateCategory,
+  deleteCategory,
+} from "../../api/CategoryServices";
 import CustomButton from "../../components/Button";
 import CustomModal from "../../components/Modal";
 import Table from "../../components/Table";
@@ -15,12 +20,11 @@ import Toast from "../../components/Toast";
 import { modalSizes } from "../../components/Utils";
 import Loader from "../../components/Loader";
 
-
-const CategoryPage = ()=> {
-  const [loading,setloading]= useState(false);
+const CategoryPage = () => {
+  const [loading, setloading] = useState(false);
   const [categories, setCategories] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState(""); 
+  const [modalType, setModalType] = useState("");
   const [currentData, setCurrentData] = useState({
     name: "",
     description: "",
@@ -38,15 +42,15 @@ const CategoryPage = ()=> {
     },
   ]);
   const [showToast, setShowToast] = useState(false);
-  const [toastType, setToastType] = useState('success');
-  const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState("success");
+  const [toastMessage, setToastMessage] = useState("");
   const showSuccessToast = (message) => {
-    setToastType('success');
+    setToastType("success");
     setToastMessage(message);
     setShowToast(true);
   };
   const showFailureToast = (message) => {
-    setToastType('failure');
+    setToastType("failure");
     setToastMessage(message);
     setShowToast(true);
   };
@@ -54,20 +58,23 @@ const CategoryPage = ()=> {
   const getCategories = async () => {
     setloading(true);
     const trimmedSearchTerm = searchTerm.trim();
-  
+
     if (trimmedSearchTerm.length >= 3 || trimmedSearchTerm.length === 0) {
       try {
-        const data = await fetchCategories(currentPage, pageSize, trimmedSearchTerm);
+        const data = await fetchCategories(
+          currentPage,
+          pageSize,
+          trimmedSearchTerm
+        );
         setCategories(data.content || []);
         setTotalPages(data.totalPages || 0);
       } catch (error) {
         showFailureToast("Can't Fetch Categories");
-      }finally{
-        setloading(false)
+      } finally {
+        setloading(false);
       }
     } else if (trimmedSearchTerm.length < 3 && trimmedSearchTerm.length > 0) {
       setloading(false);
-
     } else {
       setloading(false);
 
@@ -76,45 +83,38 @@ const CategoryPage = ()=> {
     }
   };
 
-  
-  
-
   useEffect(() => {
     getCategories();
   }, [currentPage, searchTerm]);
 
   const handleAddCategory = async (newCategory) => {
     try {
-      setloading(true)
+      setloading(true);
       const categoryToCreate = {
         name: newCategory.name.trim(),
         description: newCategory.description,
       };
-  
+
       const response = await addCategory(categoryToCreate);
-  
-      const successMessage = response.message ;
-  
+
+      const successMessage = response.message;
+
       getCategories();
       handleCloseModal();
       showSuccessToast(successMessage);
-  
     } catch (error) {
       handleCloseModal();
       showFailureToast(error.response.data.message);
-    } finally{
-      setloading(false)
-
+    } finally {
+      setloading(false);
     }
   };
-  
 
   const handleEditCategory = async (updatedCategory) => {
     try {
-      setloading(true)
+      setloading(true);
 
       const categoryToUpdate = {
-
         id: currentData.id,
         name: updatedCategory.name.trim(),
         description: updatedCategory.description,
@@ -123,23 +123,20 @@ const CategoryPage = ()=> {
       const response = await updateCategory(currentData.id, categoryToUpdate);
       getCategories();
 
-      const successMessage = response.message ;
+      const successMessage = response.message;
       handleCloseModal();
       showSuccessToast(successMessage);
-
     } catch (error) {
-      handleCloseModal()
+      handleCloseModal();
       showFailureToast(error.response.data.message);
-
-    } finally{
-      setloading(false)
-
+    } finally {
+      setloading(false);
     }
   };
 
   const handleDelete = async (id) => {
     try {
-      setloading(true)
+      setloading(true);
 
       const response = await deleteCategory(id);
       setCategories(categories.filter((category) => category.id !== id));
@@ -147,13 +144,11 @@ const CategoryPage = ()=> {
 
       showSuccessToast(response.message);
       handleCloseModal();
-
     } catch (error) {
-      showFailureToast(error.response.data.message)
-      handleCloseModal()
-    } finally{
-      setloading(false)
-
+      showFailureToast(error.response.data.message);
+      handleCloseModal();
+    } finally {
+      setloading(false);
     }
   };
 
@@ -188,10 +183,8 @@ const CategoryPage = ()=> {
       handleAddCategory(data);
     } else if (modalType === "edit") {
       handleEditCategory(data);
-    } 
+    }
   };
-
-
 
   const renderActions = (rowData) => (
     <div className="actionicons">
@@ -209,7 +202,7 @@ const CategoryPage = ()=> {
           src={DeleteIcon}
           alt="Delete"
           className="action-icon"
-          onClick={() => handleOpenModal("delete",rowData.id)}
+          onClick={() => handleOpenModal("delete", rowData.id)}
         />
       </Tooltip>
     </div>
@@ -227,16 +220,23 @@ const CategoryPage = ()=> {
             className="add"
           />
         </div>
-        {loading ? (<Loader /> ) : (
+        {loading ? (
+          <Loader />
+        ) : (
           <div className="table-container">
             {categories.length === 0 ? (
               <p>No Category found</p>
             ) : (
-              <Table data={categories} columns={columns} currentPage={currentPage} pageSize={pageSize} />
+              <Table
+                data={categories}
+                columns={columns}
+                currentPage={currentPage}
+                pageSize={pageSize}
+              />
             )}
           </div>
         )}
-        
+
         <div className="pagination-controls">
           <img
             src={back}
@@ -252,59 +252,71 @@ const CategoryPage = ()=> {
           <img
             src={next}
             alt="next"
-            className={`icon ${currentPage >= totalPages - 1 ? "disabled" : ""}`}
+            className={`icon ${
+              currentPage >= totalPages - 1 ? "disabled" : ""
+            }`}
             onClick={() => {
-              if (currentPage < totalPages - 1) handlePageChange(currentPage + 1);
+              if (currentPage < totalPages - 1)
+                handlePageChange(currentPage + 1);
             }}
           />
         </div>
       </div>
 
-      <CustomModal isOpen={isModalOpen} onClose={handleCloseModal} 
+      <CustomModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
         height={modalSizes.edit.height}
-        width={modalSizes.edit.width}>
-  {modalType === "edit" || modalType === "add" ? (
-    <Dynamicform
-      heading={modalType === "edit" ? "Edit Category" : "Add Category"}
-      fields={[
-        { label:"Name",
-          name: "name",
-          type: "text",
-          placeholder: "Category Name",
-          required: true,
-          defaultValue: currentData.name,
-        },
-        { label:"Description",
-          name: "description",
-          type: "text-area",
-          placeholder: "Description",
-          required: false,
-          defaultValue: currentData.description,
-        },
-      ]}
-      onSubmit={handleSubmitModal}
-      defaultValues={currentData} 
-    />
-  ) : modalType === "delete" ? (
-    <div className="confirmation">
-      <p>Are you sure you want to delete this Category?</p>
-      <div className="confirmation-buttons">
-      <CustomButton onClick={() => handleDelete(currentData)} name="Yes"></CustomButton>
-      <CustomButton onClick={handleCloseModal} name="No"></CustomButton></div>
-    </div>
-  ) : null} {}
-</CustomModal>
+        width={modalSizes.edit.width}
+      >
+        {modalType === "edit" || modalType === "add" ? (
+          <Dynamicform
+            heading={modalType === "edit" ? "Edit Category" : "Add Category"}
+            fields={[
+              {
+                label: "Name",
+                name: "name",
+                type: "text",
+                placeholder: "Category Name",
+                required: true,
+                defaultValue: currentData.name,
+              },
+              {
+                label: "Description",
+                name: "description",
+                type: "text-area",
+                placeholder: "Description",
+                required: false,
+                defaultValue: currentData.description,
+              },
+            ]}
+            onSubmit={handleSubmitModal}
+            defaultValues={currentData}
+          />
+        ) : modalType === "delete" ? (
+          <div className="confirmation">
+            <p>Are you sure you want to delete this Category?</p>
+            <div className="confirmation-buttons">
+              <CustomButton
+                onClick={() => handleDelete(currentData)}
+                name="Yes"
+              ></CustomButton>
+              <CustomButton onClick={handleCloseModal} name="No"></CustomButton>
+            </div>
+          </div>
+        ) : null}{" "}
+        {}
+      </CustomModal>
 
       {showToast && (
-          <Toast
-            type={toastType}
-            message={toastMessage}
-            onClose={() => setShowToast(false)}
-          />
-        )}
+        <Toast
+          type={toastType}
+          message={toastMessage}
+          onClose={() => setShowToast(false)}
+        />
+      )}
     </>
   );
-}
-
+};
 
 export default HOC(CategoryPage);
