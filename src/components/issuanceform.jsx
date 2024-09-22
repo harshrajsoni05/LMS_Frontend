@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { findBookSuggestions } from "../api/BookServices";
+import { validateNotEmpty, validateMobile } from "./Utils";
 import { SearchByNumber as findUserByMobile } from "../api/UserServices";
 import "../styles/Issuanceform.css";
-import CustomButton from "./button";
-import { formatDateTime } from "./utils";
+import CustomButton from "./Button";
+import { formatDateTime } from "./Utils";
 import { useNavigate } from "react-router-dom";
 
 const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
@@ -11,18 +12,17 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
 
   const [bookTitle, setBookTitle] = useState(selectedBook?.title || "");
   const [book_id, setBookId] = useState(selectedBook?.id || null);
-
   const [userMobileNumber, setUserMobileNumber] = useState(selectedUser?.mobile || "");
   const [user_id, setUserId] = useState(selectedUser?.id || null);
-  const [userName, setUserName] = useState(""); // New state for user name
-  
+  const [userName, setUserName] = useState("");
+
   const [issuance_type, setIssuanceType] = useState("In House");
   const [expectedReturn, setExpectedReturn] = useState("");
   const [issue_date] = useState(() => {
     const date = new Date();
     const istOffset = 5 * 60 + 30;
     const istTime = new Date(date.getTime() + istOffset * 60 * 1000);
-    return istTime.toISOString().split('.')[0];
+    return istTime.toISOString().split(".")[0];
   });
   const [errorMessage, setErrorMessage] = useState("");
   const [returnTime, setReturnTime] = useState("");
@@ -55,8 +55,8 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
   const handleSuggestionClick = (book) => {
     setBookTitle(book.title);
     setBookId(book.id);
-    setErrorMessage("");
-    setShowDropdown(false);
+    setErrorMessage(""); 
+    setShowDropdown(false); 
   };
 
   const fetchUserDetails = async (mobileNumber) => {
@@ -65,16 +65,16 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
       if (userDetails.content && userDetails.content.length > 0) {
         const user = userDetails.content[0];
         setUserId(user.id);
-        setUserName(user.name); 
-        setErrorMessage("");
+        setUserName(user.name);
+        setErrorMessage(""); 
       } else {
         setUserId(null);
-        setUserName(""); 
+        setUserName("");
         setErrorMessage("User not found. Please register first.");
       }
     } catch (error) {
       setUserId(null);
-      setUserName(""); 
+      setUserName("");
       setErrorMessage("User not found. Please register first.");
     }
   };
@@ -86,7 +86,7 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
       fetchUserDetails(mobileNumber);
     } else {
       setUserId(null);
-      setUserName(""); 
+      setUserName("");
       setErrorMessage("");
     }
   };
@@ -94,8 +94,18 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (!book_id || !user_id) {
-      setErrorMessage("Please enter valid details.");
+    if (!validateNotEmpty(bookTitle)) {
+      setErrorMessage("Book title cannot be empty.");
+      return;
+    }
+
+    if (issuance_type === "In House" && !validateNotEmpty(expectedReturn)) {
+      setErrorMessage("Expected Return Date Cannot be empty.");
+      return;
+    }
+
+    if (issuance_type === "Library" && !validateNotEmpty(returnTime)) {
+      setErrorMessage("Expected Return Time Cannot be empty.");
       return;
     }
 
@@ -104,7 +114,9 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
       returnedAt = formatDateTime(new Date(expectedReturn).toLocaleString());
     } else if (issuance_type === "Library" && returnTime) {
       const currentDate = new Date().toISOString().slice(0, 10);
-      returnedAt = formatDateTime(new Date(`${currentDate}T${returnTime}`).toLocaleString());
+      returnedAt = formatDateTime(
+        new Date(`${currentDate}T${returnTime}`).toLocaleString()
+      );
     }
 
     const issuanceDetails = {
@@ -119,37 +131,38 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
     try {
       await onSubmit(issuanceDetails);
       onClose();
-
       setTimeout(() => {
         navigate("/issuance");
-      }, 1000);
-
+      }, 2000);
     } catch (error) {
       console.error("Failed to create issuance:", error);
     }
   };
 
   const now = new Date().toISOString().slice(0, 16);
-  
+
   return (
     <div className="issuance-form">
       <h2>Issue Book</h2>
       <form onSubmit={handleSubmit}>
-        {errorMessage && <p className="error-message">{errorMessage}</p>}
-        {userName && (
-                <p className="success-message">Found user with name -  {userName}</p>
-              )}
+      {errorMessage.includes("User not") && (
+                <p className="error-message">{errorMessage}</p>
+              )}        {userName && (
+          <p className="success-message">Found user with name - {userName}</p>
+        )}
         {selectedBook ? (
           <>
             <div className="form-group">
               <label>Mobile Number</label>
               <input
-                type="text"
+                type="number"
                 value={userMobileNumber}
                 onChange={handleMobileNumberChange}
                 placeholder="Enter User Mobile Number"
               />
-              
+              {errorMessage.includes("Mobile number") && (
+                <p className="error-message">{errorMessage}</p>
+              )}
             </div>
           </>
         ) : (
@@ -165,15 +178,18 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
               {showDropdown && bookSuggestions.length > 0 && (
                 <ul className="dropdown-suggestions">
                   {bookSuggestions.map((book) => (
-                    <li key={book.id} onClick={() => {
-                      if (book.quantity > 0) {
-                        handleSuggestionClick(book);
-                      }
-                    }} className={book.quantity === 0 ? 'disabled' : ''}>
+                    <li
+                      key={book.id}
+                      onClick={() => handleSuggestionClick(book)} 
+                      className={book.quantity === 0 ? "disabled" : ""}
+                    >
                       {book.title}
                     </li>
                   ))}
                 </ul>
+              )}
+              {errorMessage.includes("Book title") && (
+                <p className="error-message">{errorMessage}</p>
               )}
             </div>
           </>
@@ -197,6 +213,9 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
               onChange={(e) => setExpectedReturn(e.target.value)}
               min={now}
             />
+            {errorMessage.includes("Expected Return Date") && (
+              <p className="error-message">{errorMessage}</p>
+            )}
           </div>
         ) : (
           <div className="form-group">
@@ -207,6 +226,9 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
               onChange={(e) => setReturnTime(e.target.value)}
               min={now}
             />
+            {errorMessage.includes("Expected Return Time") && (
+              <p className="error-message">{errorMessage}</p>
+            )}
           </div>
         )}
         <CustomButton className="submit-button" name="Issue Book" />

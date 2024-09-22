@@ -10,17 +10,17 @@ import {
 import { fetchAllCategories } from "../api/CategoryServices";
 import { addIssuance } from "../api/IssuanceServices";
 
-import CustomButton from "../components/button";
-import CustomModal from "../components/modal";
-import Table from "../components/table";
-import Searchbar from "../components/searchbar";
-import Dynamicform from "../components/dynamicform";
-import Tooltip from "../components/toolTip";
-import Toast from "../components/toast";
-import IssuanceForm from "../components/issuanceform";
-import { modalSizes } from "../components/utils";
+import CustomButton from "../components/Button";
+import CustomModal from "../components/Modal";
+import Table from "../components/Table";
+import Searchbar from "../components/Searchbar";
+import Dynamicform from "../components/DynamicForm";
+import Tooltip from "../components/ToolTip";
+import Toast from "../components/Toast";
+import IssuanceForm from "../components/IssuanceForm";
+import { modalSizes } from "../components/Utils";
 import HOC from "../hocs/WithLayoutComponent";
-import Loader from "../components/loader";
+import Loader from "../components/Loader";
 
 import EditIcon from "../assets/images/editicon.png";
 import DeleteIcon from "../assets/images/deleteicon.png";
@@ -46,17 +46,25 @@ function BooksPage() {
     userId: "",
     imageURL: "",
   });
+
+  const getPageSizeBasedOnWidth = () => {
+    const width = window.innerWidth;
+    if(width>1024){
+      return 7;
+    }
+    else if(width<=1024){
+      return 10;
+    }
+  }
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize] = useState(7);
+  const [pageSize] = useState(getPageSizeBasedOnWidth);
   const [totalPages, setTotalPages] = useState(0);
 
   const [searchTerm, setSearchTerm] = useState("");
 
   const [selectedBook, setSelectedBook] = useState(null);
 
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [issuanceType, setIssuanceType] = useState("library");
-  const [userNotRegistered, setUserNotRegistered] = useState(false);
+
 
   const [showToast, setShowToast] = useState(false);
   const [toastType, setToastType] = useState("success");
@@ -155,6 +163,8 @@ function BooksPage() {
       showSuccessToast(response.message);
     } catch (error) {
       showFailureToast(error.response.data.message);
+      handleCloseModal();
+
     } finally{
       setloading(false)
     }
@@ -222,9 +232,7 @@ function BooksPage() {
       userId: "",
       imageURL: "",
     });
-    setPhoneNumber("");
-    setIssuanceType("library");
-    setUserNotRegistered(false);
+ 
   };
 
   const handleSubmitModal = (data) => {

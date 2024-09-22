@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { fetchIssuancesbyUserId } from "../../api/IssuanceServices";
-import Table from "../../components/table";
+import Table from "../../components/Table";
 import WithLayoutComponent from "../../hocs/WithLayoutComponent";
 import '../../styles/CategoryPage.css';
 import back from  "../../assets/images/go-back.png"

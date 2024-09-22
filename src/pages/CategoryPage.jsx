@@ -1,19 +1,19 @@
 import { useState, useEffect } from "react";
 import { fetchCategories, addCategory, updateCategory, deleteCategory } from "../api/CategoryServices"; 
-import CustomButton from "../components/button";
-import CustomModal from "../components/modal";
-import Table from "../components/table";
-import Searchbar from "../components/searchbar";
+import CustomButton from "../components/Button";
+import CustomModal from "../components/Modal";
+import Table from "../components/Table";
+import Searchbar from "../components/Searchbar";
 import back from "../assets/images/go-back.png";
 import next from "../assets/images/go-next.png";
 import HOC from "../hocs/WithLayoutComponent";
-import Dynamicform from "../components/dynamicform";
+import Dynamicform from "../components/DynamicForm";
 import EditIcon from "../assets/images/editicon.png";
 import DeleteIcon from "../assets/images/deleteicon.png";
-import Tooltip from "../components/toolTip";
-import Toast from "../components/toast";
-import { modalSizes } from "../components/utils";
-import Loader from "../components/loader";
+import Tooltip from "../components/ToolTip";
+import Toast from "../components/Toast";
+import { modalSizes } from "../components/Utils";
+import Loader from "../components/Loader";
 
 
 const CategoryPage = ()=> {
@@ -128,6 +128,7 @@ const CategoryPage = ()=> {
       showSuccessToast(successMessage);
 
     } catch (error) {
+      handleCloseModal()
       showFailureToast(error.response.data.message);
 
     } finally{

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
-import LoadingToRedirect from './loadingToRedirect.jsx';
+import LoadingToRedirect from './LoadingToRedirect.jsx';
 
 const AdminRoute = ({children, ...rest}) => {
 
@@ -20,9 +20,8 @@ const AdminRoute = ({children, ...rest}) => {
     }
   }, [auth])
 
-  return verified 
-    ? children 
-    : <div className="">
+  return verified ? children : 
+      <div className="">
         <LoadingToRedirect />
       </div>
 }

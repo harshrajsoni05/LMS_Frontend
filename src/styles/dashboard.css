@@ -30,7 +30,7 @@
 .dashboard-card p {
   font-size: 1.4rem;
   margin: 0;
-  color: #000000; /* Darker text color */
+  color: #000000; 
   font-weight: bold;
 }
 
@@ -53,11 +53,11 @@
 }
 
 .book-card {
-  background-color: #e6ecf5; /* White background for the cards */
+  background-color: #e6ecf5; 
   border-radius: 8px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
   padding: 0.4rem;
-  width: 10rem; /* Adjust width as needed */
+  width: 10rem; 
   text-align: center;
   border-color: #c6d8ea;
   transition: transform 0.3s ease;
@@ -99,7 +99,7 @@
   margin-top:3%;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1370px) {
 
   .dashboard-card {
     padding: 1.5rem;
@@ -112,6 +112,75 @@
   .latest-books-container {
     margin-left: 1rem;
     margin-right: 1rem;
+  }
+
+
+  .dashboard {
+    grid-template-columns: repeat(2, 1fr); 
+    justify-content: center; 
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
+  }
+
+  .dashboard-card {
+    padding: 1rem;
+    height: auto; 
+    width: auto; 
+  }
+
+  .dashboard-card h2 {
+    font-size: 1rem;
+  }
+
+  .dashboard-card p {
+    font-size: 1.1rem;
+  }
+
+
+  
+  .book-card {
+    width: 80%;
+    height:auto;
+  }
+
+  .book-image {
+    width: 50%; 
+    height: auto; 
+  }
+
+  .book-title {
+    font-size: 0.7rem;
+  }
+
+  .book-author {
+    font-size: 0.6rem;
+  }
+
+  .recent-books-heading p {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 1370px) {
+
+  .dashboard-card {
+    padding: 1.5rem;
+    margin: 1rem;
+    height: auto; 
+    width: 100%; 
+  }
+
+  .latest-books-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); 
+    padding: 0% 10%;  
+  }
+  .latest-books-container .book-card:nth-child(5) {
+    display: none;
+  }
+  
+  .latest-books-container {
+    margin:1rem;
   }
 
 

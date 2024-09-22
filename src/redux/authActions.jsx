@@ -1,4 +1,4 @@
-import { LOGIN, LOGOUT } from "./authTypes";
+import { LOGIN, LOGOUT } from "./AuthTypes";
 
 export const loginUser = (user) => {
     return {

@@ -1,10 +1,13 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import CustomButton from "./button";
-import Modal from "../components/modal";
-import "../styles/Sidebar.css";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "../redux/authActions";
+import { logoutUser } from "../redux/AuthActions";
+
+import CustomButton from "./Button";
+import Modal from "./Modal";
+import "../styles/Sidebar.css";
+
+
 import book from "../assets/images/book.png";
 import category from "../assets/images/category.png";
 import listcheck from "../assets/images/listcheck.png";
