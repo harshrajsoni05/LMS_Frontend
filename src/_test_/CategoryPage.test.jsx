@@ -1,7 +1,7 @@
 import React,{act} from 'react';
 import { render, screen, fireEvent, waitFor } from '../test-utils';
 import '@testing-library/jest-dom';
-import CategoryPage from '../pages/CategoryPage';
+import CategoryPage from '../pages/admin/CategoryPage';
 import { fetchCategories, addCategory, updateCategory, deleteCategory } from '../api/CategoryServices';
 import HOC from '../hocs/WithLayoutComponent';
 

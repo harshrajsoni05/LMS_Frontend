@@ -11,7 +11,7 @@ import { DashboardwithLayout } from './components/Dashboard';
 import { UserwithLayout } from './pages/admin/UserPage';
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
-import { loginUser } from './redux/AuthActions';
+import { loginUser } from './redux/actions/AuthActions';
 import { getCurrentUser } from './api/Auth';
 import { UserHistoryWithLayout } from './pages/user/UserHistory';
 import { HistoryWithLayout } from './pages/admin/History';
