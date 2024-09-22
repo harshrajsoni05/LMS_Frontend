@@ -36,8 +36,7 @@ const CategoryPage = () => {
   const [columns] = useState([
     { header: "Name", accessor: "name" },
     { header: "Description", accessor: "description" },
-    {
-      header: "Actions",
+    { header: "Actions",
       render: (rowData) => renderActions(rowData),
     },
   ]);
