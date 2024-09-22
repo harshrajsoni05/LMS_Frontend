@@ -16,6 +16,7 @@ import { Link } from "react-router-dom";
 
 const LatestBooks = ({ books }) => {
   return (
+    <Link to="/books" style={{ textDecoration: "none" }}>
     <div className="latest-books-container">
       {books.map((book) => (
         <div key={book.id} className="book-card">
@@ -25,6 +26,7 @@ const LatestBooks = ({ books }) => {
         </div>
       ))}
     </div>
+    </Link>
   );
 };
 

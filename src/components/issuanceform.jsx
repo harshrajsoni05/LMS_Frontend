@@ -29,7 +29,7 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
   const [returnTime, setReturnTime] = useState("");
   const [bookSuggestions, setBookSuggestions] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
-  const [loading, setLoading] = useState(false); // Loading state
+  const [loading, setLoading] = useState(false); 
 
   const fetchBookSuggestions = async (query) => {
     if (query.length < 2) {
@@ -245,3 +245,4 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
 };
 
 export default IssuanceForm;
+

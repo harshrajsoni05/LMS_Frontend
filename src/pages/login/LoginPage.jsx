@@ -1,6 +1,6 @@
-import '../styles/LoginPage.css';
-import backgroundImage from '../assets/images/2.jpg'; 
-import LoginForm from '../components/Loginform';
+import '../../styles/LoginPage.css';
+import backgroundImage from '../../assets/images/2.jpg'; 
+import LoginForm from '../../components/Loginform';
 
 const LoginPage = () => {
   return (

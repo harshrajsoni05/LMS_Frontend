@@ -7,9 +7,8 @@ import { useNavigate } from 'react-router-dom';
 import '../styles/LoginForm.css'
 
 import Toast from './Toast';
-
 import { login } from '../api/Auth';
-import { loginUser } from '../redux/AuthActions';
+import { loginUser } from '../redux/actions/AuthActions';
 import { validateEmailOrMobile, validatePassword } from './Utils';
 
 const initialErrors = {

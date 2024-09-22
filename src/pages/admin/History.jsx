@@ -1,12 +1,15 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { fetchIssuancesbyBookId, fetchIssuancesbyUserId } from '../api/IssuanceServices';
-import Table from '../components/Table';
-import WithLayoutComponent from '../hocs/WithLayoutComponent';
-import '../styles/CategoryPage.css';
-import back from '../assets/images/go-back.png';
-import next from '../assets/images/go-next.png';
-import backbutton from '../assets/images/back (1).png';
+import '../../styles/CategoryPage.css';
+
+import { fetchIssuancesbyBookId, fetchIssuancesbyUserId } from '../../api/IssuanceServices';
+import Table from '../../components/Table';
+import WithLayoutComponent from '../../hocs/WithLayoutComponent';
+
+import back from '../../assets/images/go-back.png';
+import next from '../../assets/images/go-next.png';
+import backbutton from '../../assets/images/back (1).png';
+
 const History = () => {
   const { bookId, userId } = useParams(); 
 

@@ -1,20 +1,20 @@
 import './styles/App.css'; 
 import AdminRoute from './components/AdminRoute';  
 import UserRoute from './components/UserRoute';
-import CategoryPage from './pages/CategoryPage';
-import BooksPage from './pages/BooksPage';
-import LoginPage from './pages/LoginPage';
+import CategoryPage from './pages/admin/CategoryPage';
+import BooksPage from './pages/admin/BooksPage';
+import LoginPage from './pages/login/LoginPage';
 
 import { Routes, Route, useNavigate } from 'react-router-dom';
-import { IssuancewithLayout } from './pages/IssuancePage';
+import { IssuancewithLayout } from './pages/admin/IssuancePage';
 import { DashboardwithLayout } from './components/Dashboard';
-import { UserwithLayout } from './pages/UserPage';
+import { UserwithLayout } from './pages/admin/UserPage';
 import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
-import { loginUser } from './redux/AuthActions';
+import { loginUser } from './redux/actions/AuthActions';
 import { getCurrentUser } from './api/Auth';
-import { UserHistoryWithLayout } from './pages/User/UserHistory';
-import { HistoryWithLayout } from './pages/History';
+import { UserHistoryWithLayout } from './pages/user/UserHistory';
+import { HistoryWithLayout } from './pages/admin/History';
 
 function App() {
   const navigate = useNavigate();

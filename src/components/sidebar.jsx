@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "../redux/AuthActions";
+import { logoutUser } from "../redux/actions/AuthActions";
 
 import CustomButton from "./Button";
 import Modal from "./Modal";

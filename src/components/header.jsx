@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser } from "../redux/actions/AuthActions";
+
 import admin from "../assets/images/admin.png";
 import user from "../assets/images/user.png";
 import "../styles/Header.css";
-import { useDispatch, useSelector } from "react-redux";
-import { logoutUser } from "../redux/AuthActions";
+
 
 const Header = () => {
   const navigate = useNavigate();
