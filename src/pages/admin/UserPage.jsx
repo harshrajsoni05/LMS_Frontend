@@ -4,30 +4,30 @@ import {
   updateUser,
   deleteUser,
   RegisterUser,
-} from "../api/UserServices";
-import { fetchAllBooks } from "../api/BookServices";
-import { addIssuance } from "../api/IssuanceServices";
+} from "../../api/UserServices";
+import { fetchAllBooks } from "../../api/BookServices";
+import { addIssuance } from "../../api/IssuanceServices";
 
-import CustomModal from "../components/Modal";
-import Table from "../components/Table";
-import Searchbar from "../components/Searchbar";
-import Dynamicform from "../components/DynamicForm";
-import CustomButton from "../components/Button";
-import Tooltip from "../components/ToolTip";
-import WithLayoutComponent from "../hocs/WithLayoutComponent";
-import Toast from "../components/Toast";
-import IssuanceForm from "../components/IssuanceForm";
-import Loader from "../components/Loader";
+import CustomModal from "../../components/Modal";
+import Table from "../../components/Table";
+import Searchbar from "../../components/Searchbar";
+import Dynamicform from "../../components/DynamicForm";
+import CustomButton from "../../components/Button";
+import Tooltip from "../../components/ToolTip";
+import WithLayoutComponent from "../../hocs/WithLayoutComponent";
+import Toast from "../../components/Toast";
+import IssuanceForm from "../../components/IssuanceForm";
+import Loader from "../../components/Loader";
 
-import back from "../assets/images/go-back.png";
-import next from "../assets/images/go-next.png";
-import EditIcon from "../assets/images/editicon.png";
-import DeleteIcon from "../assets/images/deleteicon.png";
-import assign from "../assets/images/bookaddd.png";
-import historyicon from "../assets/images/historyicon.png";
+import back from "../../assets/images/go-back.png";
+import next from "../../assets/images/go-next.png";
+import EditIcon from "../../assets/images/editicon.png";
+import DeleteIcon from "../../assets/images/deleteicon.png";
+import assign from "../../assets/images/bookaddd.png";
+import historyicon from "../../assets/images/historyicon.png";
 
 import { useNavigate } from "react-router-dom";
-import { modalSizes } from "../components/Utils";
+import { modalSizes } from "../../components/Utils";
 
 function UsersPage() {
   const [users, setUsers] = useState([]);

@@ -1,27 +1,27 @@
 import { useState, useEffect } from "react";
-import "../styles/CategoryPage.css";
+import "../../styles/CategoryPage.css";
 import {
   fetchIssuances,
   updateIssuance,
   deleteIssuance,
-} from "../api/IssuanceServices";
+} from "../../api/IssuanceServices";
 
-import CustomModal from "../components/Modal";
-import Table from "../components/Table";
-import SearchBar from "../components/Searchbar";
-import WithLayoutComponent from "../hocs/WithLayoutComponent";
-import Dynamicform from "../components/DynamicForm";
-import Tooltip from "../components/ToolTip";
-import Toast from "../components/Toast";
-import Loader from "../components/Loader";
-import CustomButton from "../components/Button";
+import CustomModal from "../../components/Modal";
+import Table from "../../components/Table";
+import SearchBar from "../../components/Searchbar";
+import WithLayoutComponent from "../../hocs/WithLayoutComponent";
+import Dynamicform from "../../components/DynamicForm";
+import Tooltip from "../../components/ToolTip";
+import Toast from "../../components/Toast";
+import Loader from "../../components/Loader";
+import CustomButton from "../../components/Button";
 
 
-import back from "../assets/images/go-back.png";
-import next from "../assets/images/go-next.png";
-import EditIcon from "../assets/images/editicon.png";
-import DeleteIcon from "../assets/images/deleteicon.png";
-import { getCurrentDateTime } from "../components/Utils";
+import back from "../../assets/images/go-back.png";
+import next from "../../assets/images/go-next.png";
+import EditIcon from "../../assets/images/editicon.png";
+import DeleteIcon from "../../assets/images/deleteicon.png";
+import { getCurrentDateTime } from "../../components/Utils";
 
 function IssuancesPage() {
   const [issuances, setIssuances] = useState([]);

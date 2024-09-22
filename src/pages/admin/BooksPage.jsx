@@ -6,28 +6,28 @@ import {
   addBook,
   updateBook,
   deleteBook,
-} from "../api/BookServices";
-import { fetchAllCategories } from "../api/CategoryServices";
-import { addIssuance } from "../api/IssuanceServices";
+} from "../../api/BookServices";
+import { fetchAllCategories } from "../../api/CategoryServices";
+import { addIssuance } from "../../api/IssuanceServices";
 
-import CustomButton from "../components/Button";
-import CustomModal from "../components/Modal";
-import Table from "../components/Table";
-import Searchbar from "../components/Searchbar";
-import Dynamicform from "../components/DynamicForm";
-import Tooltip from "../components/ToolTip";
-import Toast from "../components/Toast";
-import IssuanceForm from "../components/IssuanceForm";
-import { modalSizes } from "../components/Utils";
-import HOC from "../hocs/WithLayoutComponent";
-import Loader from "../components/Loader";
+import CustomButton from "../../components/Button";
+import CustomModal from "../../components/Modal";
+import Table from "../../components/Table";
+import Searchbar from "../../components/Searchbar";
+import Dynamicform from "../../components/DynamicForm";
+import Tooltip from "../../components/ToolTip";
+import Toast from "../../components/Toast";
+import IssuanceForm from "../../components/IssuanceForm";
+import { modalSizes } from "../../components/Utils";
+import HOC from "../../hocs/WithLayoutComponent";
+import Loader from "../../components/Loader";
 
-import EditIcon from "../assets/images/editicon.png";
-import DeleteIcon from "../assets/images/deleteicon.png";
-import historyicon from "../assets/images/historyicon.png";
-import back from "../assets/images/go-back.png";
-import next from "../assets/images/go-next.png";
-import AssignUser from "../assets/images/alloticon.png";
+import EditIcon from "../../assets/images/editicon.png";
+import DeleteIcon from "../../assets/images/deleteicon.png";
+import historyicon from "../../assets/images/historyicon.png";
+import back from "../../assets/images/go-back.png";
+import next from "../../assets/images/go-next.png";
+import AssignUser from "../../assets/images/alloticon.png";
 
 function BooksPage() {
   const navigate = useNavigate();
