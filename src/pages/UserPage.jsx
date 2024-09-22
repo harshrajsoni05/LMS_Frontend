@@ -8,16 +8,16 @@ import {
 import { fetchAllBooks } from "../api/BookServices";
 import { addIssuance } from "../api/IssuanceServices";
 
-import CustomModal from "../components/modal";
-import Table from "../components/table";
-import Searchbar from "../components/searchbar";
-import Dynamicform from "../components/dynamicform";
-import CustomButton from "../components/button";
-import Tooltip from "../components/toolTip";
+import CustomModal from "../components/Modal";
+import Table from "../components/Table";
+import Searchbar from "../components/Searchbar";
+import Dynamicform from "../components/DynamicForm";
+import CustomButton from "../components/Button";
+import Tooltip from "../components/ToolTip";
 import WithLayoutComponent from "../hocs/WithLayoutComponent";
-import Toast from "../components/toast";
-import IssuanceForm from "../components/issuanceform";
-import Loader from "../components/loader";
+import Toast from "../components/Toast";
+import IssuanceForm from "../components/IssuanceForm";
+import Loader from "../components/Loader";
 
 import back from "../assets/images/go-back.png";
 import next from "../assets/images/go-next.png";
@@ -27,7 +27,7 @@ import assign from "../assets/images/bookaddd.png";
 import historyicon from "../assets/images/historyicon.png";
 
 import { useNavigate } from "react-router-dom";
-import { modalSizes } from "../components/utils";
+import { modalSizes } from "../components/Utils";
 
 function UsersPage() {
   const [users, setUsers] = useState([]);
@@ -37,7 +37,16 @@ function UsersPage() {
   const [modalType, setModalType] = useState("");
   const [currentData, setCurrentData] = useState({});
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize] = useState(7);
+  const getPageSizeBasedOnWidth = () => {
+    const width = window.innerWidth;
+    if(width>1024){
+      return 7;
+    }
+    else if(width<=1024){
+      return 10;
+    }
+  }
+  const [pageSize] = useState(getPageSizeBasedOnWidth);
   const [totalPages, setTotalPages] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedBook, setSelectedBook] = useState(null);
@@ -61,7 +70,7 @@ function UsersPage() {
   };
 
   const navigate = useNavigate();
-
+  
   const getUsers = async () => {
     setLoading(true);
 
@@ -111,8 +120,8 @@ function UsersPage() {
       const userToUpdate = {
         id: currentData.id,
         name: updatedUser.name,
-        email: updatedUser.email,
-        number: updatedUser.number,
+        email: updatedUser.email.trim(),
+        number: updatedUser.number.trim(),
         role: "ROLE_USER",
       };
 
@@ -130,6 +139,7 @@ function UsersPage() {
     } catch (error) {
       console.error("Failed to update user:", error);
       showFailureToast(error.response.data.message);
+      handleCloseModal()
     } finally{
       setLoading(false)
 
@@ -154,16 +164,12 @@ function UsersPage() {
 
   const handleIssueBook = async (issuanceDetails) => {
     try {
-      setLoading(true)
       const response = await addIssuance(issuanceDetails);
       handleCloseModal();
       showSuccessToast(response.message);
     } catch (error) {
       showFailureToast(error.response.data.message);
-    } finally{
-      setLoading(false)
-
-    }
+    } 
   };
 
   const handleSearchChange = (e) => {
@@ -195,6 +201,7 @@ function UsersPage() {
   };
 
   const handleRegister = async (userdata) => {
+    setLoading(true)
     try {
       const updatedUserData = { ...userdata, role: "ROLE_USER" };
 
@@ -207,6 +214,8 @@ function UsersPage() {
       showSuccessToast(response.message);
     } catch (error) {
       showFailureToast(error.response.data.message);
+    } finally {
+      setLoading(false);
     }
   };
 

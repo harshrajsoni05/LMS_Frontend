@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import "../styles/Dynamicform.css";
-import CustomButton from '../components/button';
-import { formatDateTime, validateEmail, validateMobile } from './utils';
+import CustomButton from './Button';
+import {  validateEmail, validateMobile } from './Utils';
 
 const Dynamicform = ({ fields, onSubmit, heading, defaultValues }) => {
   const [formData, setFormData] = useState({});

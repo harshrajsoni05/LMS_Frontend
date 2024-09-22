@@ -1,14 +1,18 @@
 import { useState, useEffect } from "react";
-import { fetchDashboardCounts, fetchRecentBooks } from "../api/DashboardServices";
-import "../styles/dashboard.css"; 
+import {
+  fetchDashboardCounts,
+  fetchRecentBooks,
+} from "../api/DashboardServices";
+import "../styles/dashboard.css";
+
+import Loader from "./Loader";
+import HOC from "../hocs/WithLayoutComponent";
 
 import books from "../assets/images/books.png";
 import categories from "../assets/images/categories.png";
 import democracy from "../assets/images/democracy.png";
 import userss from "../assets/images/userss.png";
-
-import withLayout from "../hocs/WithLayoutComponent";
-import Loader from "./loader";
+import { Link } from "react-router-dom";
 
 const LatestBooks = ({ books }) => {
   return (
@@ -50,9 +54,7 @@ const Dashboard = () => {
 
         const recentBooks = await fetchRecentBooks();
         setLatestBooks(recentBooks);
-      } 
-      
-        catch (error) {
+      } catch (error) {
         console.error("Error fetching dashboard data", error);
       } finally {
         setLoading(false);
@@ -69,30 +71,42 @@ const Dashboard = () => {
       ) : (
         <>
           <div className="dashboard">
-            <div className="dashboard-card">
-              <img src={books} alt="Books" />
-              <h2>Total Books</h2>
-              <p>{data.booksCount}</p>
-            </div>
-            <div className="dashboard-card">
-              <img src={userss} alt="Users" />
-              <h2>Total Users</h2>
-              <p>{data.usersCount}</p>
-            </div>
-            <div className="dashboard-card">
-              <img src={categories} alt="Categories" />
-              <h2>Categories</h2>
-              <p>{data.categoriesCount}</p>
-            </div>
-            <div className="dashboard-card">
-              <img src={democracy} alt="Issued Books" />
-              <h2>Issued Books</h2>
-              <p>{data.issuancesCount}</p>
-            </div>
+            <Link to="/category" style={{ textDecoration: "none" }}>
+              <div className="dashboard-card">
+                <img src={categories} alt="Categories" />
+                <h2>Categories</h2>
+                <p>{data.categoriesCount}</p>
+              </div>
+            </Link>
+            <Link to="/books" style={{ textDecoration: "none" }}>
+              <div className="dashboard-card">
+                <img src={books} alt="Books" />
+                <h2>Total Books</h2>
+                <p>{data.booksCount}</p>
+              </div>
+            </Link>
+
+            <Link to="/user" style={{ textDecoration: "none" }}>
+              <div className="dashboard-card">
+                <img src={userss} alt="Users" />
+                <h2>Total Users</h2>
+                <p>{data.usersCount}</p>
+              </div>
+            </Link>
+
+            <Link to="/issuance" style={{ textDecoration: "none" }}>
+              <div className="dashboard-card">
+                <img src={democracy} alt="Issued Books" />
+                <h2>Issued Books</h2>
+                <p>{data.issuancesCount}</p>
+              </div>
+            </Link>
           </div>
+
           <div className="recent-books-heading">
             <p>Recently Added Collection</p>
           </div>
+
           <LatestBooks books={latestBooks} />
         </>
       )}
@@ -100,4 +114,4 @@ const Dashboard = () => {
   );
 };
 
-export const DashboardWithLayout = withLayout(Dashboard);
+export const DashboardwithLayout = HOC(Dashboard);

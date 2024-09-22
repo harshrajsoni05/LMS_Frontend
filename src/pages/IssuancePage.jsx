@@ -6,24 +6,22 @@ import {
   deleteIssuance,
 } from "../api/IssuanceServices";
 
-//components
-import CustomModal from "../components/modal";
-import Table from "../components/table";
-import SearchBar from "../components/searchbar";
+import CustomModal from "../components/Modal";
+import Table from "../components/Table";
+import SearchBar from "../components/Searchbar";
 import WithLayoutComponent from "../hocs/WithLayoutComponent";
-import Dynamicform from "../components/dynamicform";
-import Tooltip from "../components/toolTip";
-import Toast from "../components/toast";
-import Loader from "../components/loader";
-import CustomButton from "../components/button";
+import Dynamicform from "../components/DynamicForm";
+import Tooltip from "../components/ToolTip";
+import Toast from "../components/Toast";
+import Loader from "../components/Loader";
+import CustomButton from "../components/Button";
 
 
-//images
 import back from "../assets/images/go-back.png";
 import next from "../assets/images/go-next.png";
 import EditIcon from "../assets/images/editicon.png";
 import DeleteIcon from "../assets/images/deleteicon.png";
-import { getCurrentDateTime } from "../components/utils";
+import { getCurrentDateTime } from "../components/Utils";
 
 function IssuancesPage() {
   const [issuances, setIssuances] = useState([]);
@@ -35,7 +33,17 @@ function IssuancesPage() {
   const [currentData, setCurrentData] = useState({});
 
   const [currentPage, setCurrentPage] = useState(0);
-  const [pageSize] = useState(7);
+  
+  const getPageSizeBasedOnWidth = () => {
+    const width = window.innerWidth;
+    if(width>1024){
+      return 7;
+    }
+    else if(width<=1024){
+      return 8;
+    }
+  }
+  const [pageSize] = useState(getPageSizeBasedOnWidth);
   const [totalPages, setTotalPages] = useState(0);
 
   const [searchTerm, setSearchTerm] = useState("");
@@ -304,7 +312,7 @@ function IssuancesPage() {
                label: "Return date",
                type: "datetime-local",
                placeholder: "Return Date",
-               required: false,
+               required: true,
                defaultValue: currentData.return_date || getCurrentDateTime(),
               },
            ]}

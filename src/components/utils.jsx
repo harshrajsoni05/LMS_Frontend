@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 export const validateEmailOrMobile = (input) => {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailPattern = /^[^\s@]+@[^\s@]+\.(com|in|org)$/i;
     const mobilePattern = /^[0-9]{10}$/;
     return emailPattern.test(input) || mobilePattern.test(input);
 };

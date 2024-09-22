@@ -6,11 +6,11 @@ import { useNavigate } from 'react-router-dom';
 
 import '../styles/LoginForm.css'
 
-import Toast from './toast';
+import Toast from './Toast';
 
 import { login } from '../api/Auth';
-import { loginUser } from '../redux/authActions';
-import { validateEmailOrMobile, validatePassword } from '../components/utils';
+import { loginUser } from '../redux/AuthActions';
+import { validateEmailOrMobile, validatePassword } from './Utils';
 
 const initialErrors = {
   username: '',

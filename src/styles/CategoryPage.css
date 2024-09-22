@@ -91,9 +91,11 @@ h1 {
   transform: scale(1.1);
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px  ) {
 
-
+  .category-page {
+    padding-top: 2rem;
+  }
   .category-heading h1 {
       font-size: 1.25rem;
   }
@@ -132,6 +134,10 @@ h1 {
     display:grid;
     grid-template-columns: repeat(2, 1fr); 
     margin:0;
+  }
+  .table-container {
+    overflow-y: scroll;
+    height:70vh;
   }
   .action-buttons {
     display:grid;
