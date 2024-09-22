@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { findBookSuggestions } from "../api/BookServices";
-import { validateNotEmpty, validateMobile } from "./Utils";
+import { validateNotEmpty } from "./Utils";
 import { SearchByNumber as findUserByMobile } from "../api/UserServices";
 import "../styles/Issuanceform.css";
 import CustomButton from "./Button";
 import { formatDateTime } from "./Utils";
 import { useNavigate } from "react-router-dom";
+import Loader from "./Loader";
 
 const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
   const [returnTime, setReturnTime] = useState("");
   const [bookSuggestions, setBookSuggestions] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [loading, setLoading] = useState(false); // Loading state
 
   const fetchBookSuggestions = async (query) => {
     if (query.length < 2) {
@@ -42,7 +44,7 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
     } catch (error) {
       console.error("Failed to fetch book suggestions:", error);
       setBookSuggestions([]);
-    }
+    } 
   };
 
   const handleBookTitleChange = (e) => {
@@ -76,7 +78,7 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
       setUserId(null);
       setUserName("");
       setErrorMessage("User not found. Please register first.");
-    }
+    } 
   };
 
   const handleMobileNumberChange = (e) => {
@@ -128,6 +130,7 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
       issuance_type,
     };
 
+    setLoading(true); 
     try {
       await onSubmit(issuanceDetails);
       onClose();
@@ -136,6 +139,8 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
       }, 2000);
     } catch (error) {
       console.error("Failed to create issuance:", error);
+    } finally {
+      setLoading(false); 
     }
   };
 
@@ -143,11 +148,13 @@ const IssuanceForm = ({ onSubmit, selectedUser, selectedBook, onClose }) => {
 
   return (
     <div className="issuance-form">
+      {loading && <Loader />} 
       <h2>Issue Book</h2>
       <form onSubmit={handleSubmit}>
-      {errorMessage.includes("User not") && (
-                <p className="error-message">{errorMessage}</p>
-              )}        {userName && (
+        {errorMessage.includes("User not") && (
+          <p className="error-message">{errorMessage}</p>
+        )}
+        {userName && (
           <p className="success-message">Found user with name - {userName}</p>
         )}
         {selectedBook ? (

@@ -44,12 +44,12 @@ function App() {
 
   return (
     <Routes>
-      <Route path='/'         element={<LoginPage />}/>
-      <Route path='/category' element={<AdminRoute>   <CategoryPage />           </AdminRoute>}/>
-      <Route path='/issuance' element={<AdminRoute>   <IssuancewithLayout />     </AdminRoute>}/>
-      <Route path='/books'    element={<AdminRoute>   <BooksPage />              </AdminRoute>}/>
-      <Route path='/dashboard'element={<AdminRoute>   <DashboardwithLayout />    </AdminRoute>}/>
-      <Route path='/user'     element={<AdminRoute>   <UserwithLayout/>          </AdminRoute>}/>
+      <Route path='/'           element={<LoginPage />}/>
+      <Route path='/category'   element={<AdminRoute>   <CategoryPage />           </AdminRoute>}/>
+      <Route path='/issuance'   element={<AdminRoute>   <IssuancewithLayout />     </AdminRoute>}/>
+      <Route path='/books'      element={<AdminRoute>   <BooksPage />              </AdminRoute>}/>
+      <Route path='/dashboard'  element={<AdminRoute>   <DashboardwithLayout />    </AdminRoute>}/>
+      <Route path='/user'       element={<AdminRoute>   <UserwithLayout/>          </AdminRoute>}/>
       <Route path='/history/:bookId'   
         element={<AdminRoute>   <HistoryWithLayout />   </AdminRoute>}/>
       <Route path='/history/book/:bookId' 

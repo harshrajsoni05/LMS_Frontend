@@ -164,16 +164,12 @@ function UsersPage() {
 
   const handleIssueBook = async (issuanceDetails) => {
     try {
-      setLoading(true)
       const response = await addIssuance(issuanceDetails);
       handleCloseModal();
       showSuccessToast(response.message);
     } catch (error) {
       showFailureToast(error.response.data.message);
-    } finally{
-      setLoading(false)
-
-    }
+    } 
   };
 
   const handleSearchChange = (e) => {
